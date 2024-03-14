@@ -1,6 +1,6 @@
-# bae
+# BenefitsAtEase (BAE)
 
-A new Flutter project.
+BenefitsAtEase (BAE) is a software application designed to simplify the process of managing and keeping track of personal finances. This application helps our client monitor and analyze their income, expenses, reimbursements and benefits, and spending habits. The primary objective for this project is to create a centralized and user-friendly interface to address challenges which may be faced when it comes to financial literacy and effective management of financial records.
 
 ## Getting Started
 
