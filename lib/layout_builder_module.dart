@@ -3,6 +3,8 @@ import 'navigation_destinations.dart';
 import 'home_page.dart';
 import 'savings_page.dart';
 import 'account_page.dart';
+import 'alerts_page.dart';
+import 'expenses_page.dart';
 
 class ResponsiveLayout extends StatelessWidget {
   final int pageIndex;
@@ -23,6 +25,12 @@ class ResponsiveLayout extends StatelessWidget {
         break;
       case 1:
         page = const SavingsPage();
+        break;
+      case 2:
+        page = const ExpensesPage();
+        break;
+      case 3:
+        page = const AlertsPage();
         break;
       case 4:
         page = const AccountPage();
@@ -49,7 +57,6 @@ class ResponsiveLayout extends StatelessWidget {
               children: [
                 NavigationRail(
                   minWidth: 80,
-                  backgroundColor: const Color(0xFFf3ecfa),
                   groupAlignment: 0,
                   labelType: NavigationRailLabelType.all,
                   destinations: NavigationDestinations.getDestinations(),

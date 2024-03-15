@@ -3,7 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'layout_builder_module.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => MyAppState(),
+      child: const MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -12,19 +19,50 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
-      child: MaterialApp(
-        title: 'BAE',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorSchemeSeed: Colors.deepPurple,
-        ),
-        home: const MyHomePage(),
+      child: Consumer<MyAppState>(
+        builder: (context, appState, child) {
+          return MaterialApp(
+            title: 'BAE',
+            theme: ThemeData(
+              useMaterial3: true,
+              colorSchemeSeed: Colors.deepPurple,
+            ),
+            darkTheme: ThemeData.dark(),
+            themeMode: appState.themeModeNotifier.value,
+            home: const MyHomePage(),
+          );
+        },
       ),
     );
   }
 }
 
 class MyAppState extends ChangeNotifier {
+  String _profileImageUrl = '';
+  String _username = 'Win';
+
+  String get profileImageUrl => _profileImageUrl;
+  String get username => _username;
+
+  void updateProfile(String newProfileImageUrl, String newUsername) {
+    _profileImageUrl = newProfileImageUrl;
+    _username = newUsername;
+    notifyListeners();
+  }
+
+  final ValueNotifier<ThemeMode> _themeModeNotifier = ValueNotifier(ThemeMode.light);
+
+  ValueNotifier<ThemeMode> get themeModeNotifier => _themeModeNotifier;
+
+  void toggleThemeMode() {
+    if (_themeModeNotifier.value == ThemeMode.light) {
+      _themeModeNotifier.value = ThemeMode.dark;
+    } else {
+      _themeModeNotifier.value = ThemeMode.light;
+    }
+    notifyListeners();
+  }
+
   var current = WordPair.random();
 
   void getNext() {
