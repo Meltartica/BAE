@@ -1,7 +1,8 @@
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'layout_builder_module.dart';
+import 'expenses_page.dart';
+import 'savings_page.dart';
 
 void main() {
   runApp(
@@ -63,21 +64,30 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  var current = WordPair.random();
+  List<Expense> expenses = [
+    Expense(item: 'Groceries', price: 50.0, category: 'Food'),
+    Expense(item: 'Gas', price: 20.0, category: 'Transportation'),
+    Expense(item: 'Restaurant', price: 30.0, category: 'Food'),
+  ];
 
-  void getNext() {
-    current = WordPair.random();
+  void addExpense(Expense expense) {
+    expenses.add(expense);
     notifyListeners();
   }
 
-  var favorites = <WordPair>[];
+  void removeExpense(Expense expense) {
+    expenses.remove(expense);
+    notifyListeners();
+  }
 
-  void toggleFavorite() {
-    if (favorites.contains(current)) {
-      favorites.remove(current);
-    } else {
-      favorites.add(current);
-    }
+  List<Transaction> transactions = [];
+
+  double get totalSavings {
+    return transactions.fold(0, (previousValue, transaction) => previousValue + transaction.amount);
+  }
+
+  void addTransaction(Transaction transaction) {
+    transactions.add(transaction);
     notifyListeners();
   }
 }
@@ -101,35 +111,6 @@ class _MyHomePageState extends State<MyHomePage> {
           pageIndex = value;
         });
       },
-    );
-  }
-}
-
-class BigCard extends StatelessWidget {
-  const BigCard({
-    super.key,
-    required this.pair,
-  });
-
-  final WordPair pair;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final style = theme.textTheme.displayMedium!.copyWith(
-      color: theme.colorScheme.onPrimary,
-    );
-
-    return Card(
-      color: theme.colorScheme.primary,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Text(
-          pair.asLowerCase,
-          style: style,
-          semanticsLabel: "${pair.first} ${pair.second}",
-        ),
-      ),
     );
   }
 }

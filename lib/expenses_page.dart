@@ -1,50 +1,89 @@
 import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
+import 'package:provider/provider.dart';
+import 'main.dart';
+import 'functions.dart';
 
 class Expense {
   final String item;
   final double price;
+  final String category;
 
-  Expense({required this.item, required this.price});
+  Expense({required this.item, required this.price, required this.category});
 }
 
-class ExpensesPage extends StatefulWidget {
+class ExpensesPage extends StatelessWidget {
   const ExpensesPage({super.key});
 
   @override
-  _ExpensesPageState createState() => _ExpensesPageState();
-}
-
-class _ExpensesPageState extends State<ExpensesPage> {
-  List<Expense> expenses = [
-    Expense(item: 'Groceries', price: 50.0),
-    Expense(item: 'Gas', price: 20.0),
-    Expense(item: 'Restaurant', price: 30.0),
-  ];
-
-  @override
   Widget build(BuildContext context) {
+    var appState = Provider.of<MyAppState>(context);
+    double totalSpent = appState.expenses.fold(0, (prev, element) => prev + element.price);
+    var expensesByCategory = groupBy(appState.expenses, (Expense e) => e.category);
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
-        child: AppBar(
-          title: const Padding(
-            padding: EdgeInsets.only(top: 25.0),
-            child: Text(
-              'Expenses',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 30,
-              ),
-            ),
-          ),
-        ),
+        child: AppBarBuilder.buildAppBar('Expenses'),
       ),
-      body: ListView.builder(
-        itemCount: expenses.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(expenses[index].item),
-            trailing: Text('\$${expenses[index].price.toStringAsFixed(2)}'),
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          double cardWidth = constraints.maxWidth * 0.975;
+
+          return Column(
+            children: [
+              SizedBox(
+                width: cardWidth,
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'Total spent today: \$${totalSpent.toStringAsFixed(2)}',
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  children: expensesByCategory.entries.map((entry) {
+                    return SizedBox(
+                      width: cardWidth,
+                      child: Card(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                entry.key,
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                            ),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: entry.value.length,
+                              itemBuilder: (context, index) {
+                                return ListTile(
+                                  title: Text('${entry.value[index].item} - \$${entry.value[index].price.toStringAsFixed(2)}'),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    onPressed: () {
+                                      // TODO: Implement edit functionality
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
           );
         },
       ),
@@ -54,46 +93,37 @@ class _ExpensesPageState extends State<ExpensesPage> {
             MaterialPageRoute(builder: (context) => AddExpensePage()),
           );
           if (newExpense != null) {
-            setState(() {
-              expenses.add(newExpense);
-            });
+            appState.addExpense(newExpense);
           }
         },
-        label: Text(
-          'Add',
-          style: Theme.of(context).textTheme.button,
-        ),
+        label: const Text('Add'),
         icon: const Icon(Icons.add),
       ),
     );
   }
 }
 
-class AddExpensePage extends StatefulWidget {
-  @override
-  _AddExpensePageState createState() => _AddExpensePageState();
-}
+class AddExpensePage extends StatelessWidget {
+  final TextEditingController _itemController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _categoryController = TextEditingController();
 
-class _AddExpensePageState extends State<AddExpensePage> {
-  final _formKey = GlobalKey<FormState>();
-  final _itemController = TextEditingController();
-  final _priceController = TextEditingController();
+  AddExpensePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Expense'),
+        title: const Text('Add Expense'),
       ),
       body: Form(
-        key: _formKey,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: <Widget>[
               TextFormField(
                 controller: _itemController,
-                decoration: InputDecoration(labelText: 'Item'),
+                decoration: const InputDecoration(labelText: 'Item'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter an item name';
@@ -103,7 +133,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
               ),
               TextFormField(
                 controller: _priceController,
-                decoration: InputDecoration(labelText: 'Price'),
+                decoration: const InputDecoration(labelText: 'Price'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -112,17 +142,29 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   return null;
                 },
               ),
+              TextFormField(
+                controller: _categoryController,
+                decoration: const InputDecoration(labelText: 'Category'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a category';
+                  }
+                  return null;
+                },
+              ),
               ElevatedButton(
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
+                  if (Form.of(context).validate()) {
                     final expense = Expense(
                       item: _itemController.text,
                       price: double.parse(_priceController.text),
+                      category: _categoryController.text,
                     );
-                    Navigator.of(context).pop(expense);
+                    Provider.of<MyAppState>(context, listen: false).addExpense(expense);
+                    Navigator.of(context).pop();
                   }
                 },
-                child: Text('Save'),
+                child: const Text('Save'),
               ),
             ],
           ),

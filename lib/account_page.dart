@@ -11,18 +11,7 @@ class AccountPage extends StatelessWidget {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
-        child: AppBar(
-          title: const Padding(
-            padding: EdgeInsets.only(top: 25.0),
-            child: Text(
-              'Account',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 30,
-              ),
-            ),
-          ),
-        ),
+        child: AppBarBuilder.buildAppBar('Account'),
       ),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {

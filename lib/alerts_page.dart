@@ -17,7 +17,7 @@ class _AlertsPageState extends State<AlertsPage> {
         preferredSize: const Size.fromHeight(70),
         child: AppBar(
           title: const Padding(
-            padding: EdgeInsets.only(top: 25.0),
+            padding: EdgeInsets.only(top: 15.0),
             child: Text(
               'Notifications',
               style: TextStyle(
@@ -31,8 +31,30 @@ class _AlertsPageState extends State<AlertsPage> {
       body: ListView.builder(
         itemCount: notifications.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(notifications[index]),
+          return Dismissible(
+            key: Key(notifications[index]),
+            onDismissed: (direction) {
+              setState(() {
+                notifications.removeAt(index);
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Notification dismissed')),
+              );
+            },
+            child: Card(
+              child: ListTile(
+                title: Text('Notification ${index + 1}'),
+                subtitle: Text(notifications[index]),
+                trailing: IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    setState(() {
+                      notifications.removeAt(index);
+                    });
+                  },
+                ),
+              ),
+            ),
           );
         },
       ),
@@ -44,7 +66,7 @@ class _AlertsPageState extends State<AlertsPage> {
         },
         label: Text(
           'Clear All',
-          style: Theme.of(context).textTheme.button,
+          style: Theme.of(context).textTheme.labelLarge,
         ),
         icon: const Icon(Icons.clear_all),
       ),

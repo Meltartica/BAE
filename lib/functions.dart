@@ -43,3 +43,20 @@ class EditProfileDialog extends StatelessWidget {
     );
   }
 }
+
+class AppBarBuilder {
+  static AppBar buildAppBar(String title) {
+    return AppBar(
+      title: Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 30,
+          ),
+        ),
+      ),
+    );
+  }
+}
