@@ -30,7 +30,8 @@ class _AlertsPageState extends State<AlertsPage> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Notification Dismissed'),
+        content: Text('Notification Dismissed', style: Theme.of(context).textTheme.bodyLarge),
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
         action: SnackBarAction(
           label: 'Undo',
           onPressed: () {
@@ -38,6 +39,7 @@ class _AlertsPageState extends State<AlertsPage> {
               notifications[key] = dismissedNotification;
             });
           },
+          textColor: Theme.of(context).colorScheme.primary,
         ),
       ),
     );
