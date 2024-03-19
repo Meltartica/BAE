@@ -73,7 +73,8 @@ class _AlertsPageState extends State<AlertsPage> {
                         child: ListTile(
                           title: Text('Notification ${index + 1}'),
                           subtitle: Text(
-                            "${notifications[key]?.split("").take(100).join("")}...",
+                            notifications[key]!,
+                            overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.justify,
                           ),
                           trailing: IconButton(

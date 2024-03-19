@@ -50,11 +50,12 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  final ValueNotifier<ThemeMode> _themeModeNotifier = ValueNotifier(ThemeMode.light);
+  final ValueNotifier<ThemeMode> _themeModeNotifier = ValueNotifier(ThemeMode.dark);
 
   ValueNotifier<ThemeMode> get themeModeNotifier => _themeModeNotifier;
 
   void toggleThemeMode() {
+
     if (_themeModeNotifier.value == ThemeMode.light) {
       _themeModeNotifier.value = ThemeMode.dark;
     } else {
@@ -63,19 +64,17 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Expense> expenses = [
-    Expense(item: 'Groceries', price: 50.0, category: 'Food'),
-    Expense(item: 'Gas', price: 20.0, category: 'Transportation'),
-    Expense(item: 'Restaurant', price: 30.0, category: 'Food'),
-  ];
+  final List<Expense> _expenses = [];
+
+  List<Expense> get expenses => _expenses;
 
   void addExpense(Expense expense) {
-    expenses.add(expense);
+    _expenses.add(expense);
     notifyListeners();
   }
 
-  void removeExpense(Expense expense) {
-    expenses.remove(expense);
+  void deleteExpense(Expense expense) {
+    _expenses.remove(expense);
     notifyListeners();
   }
 

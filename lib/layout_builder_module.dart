@@ -44,7 +44,7 @@ class ResponsiveLayout extends StatelessWidget {
               onDestinationSelected: (index) {
                 _pageController.animateToPage(
                   index,
-                  duration: const Duration(milliseconds: 400),
+                  duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                 );
               },
@@ -64,7 +64,7 @@ class ResponsiveLayout extends StatelessWidget {
                   onDestinationSelected: (index) {
                     _pageController.animateToPage(
                       index,
-                      duration: const Duration(milliseconds: 400),
+                      duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                     );
                   },
@@ -74,10 +74,11 @@ class ResponsiveLayout extends StatelessWidget {
                     color: Theme.of(context).colorScheme.primaryContainer,
                     child: PageView(
                       controller: _pageController,
-                      children: pages,
                       onPageChanged: (index) {
                         onDestinationSelected(index);
                       },
+                      scrollDirection: Axis.vertical,
+                      children: pages, // Add this line
                     ),
                   ),
                 ),
