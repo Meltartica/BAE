@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'layout_builder_module.dart';
 import 'expenses_page.dart';
-import 'savings_page.dart';
 
 void main() {
   runApp(
@@ -80,14 +79,11 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Transaction> transactions = [];
+  double _savings = 0.0;
+  double get savings => _savings;
 
-  double get totalSavings {
-    return transactions.fold(0, (previousValue, transaction) => previousValue + transaction.amount);
-  }
-
-  void addTransaction(Transaction transaction) {
-    transactions.add(transaction);
+  void addSavings(double amount) {
+    _savings += amount;
     notifyListeners();
   }
 }

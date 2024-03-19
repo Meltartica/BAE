@@ -9,45 +9,45 @@ import 'expenses_page.dart';
 class ResponsiveLayout extends StatelessWidget {
   final int pageIndex;
   final Function(int) onDestinationSelected;
+  final PageController _pageController;
 
-  const ResponsiveLayout({
+  ResponsiveLayout({
     required this.pageIndex,
     required this.onDestinationSelected,
     super.key,
-  });
+  }) : _pageController = PageController(initialPage: pageIndex);
 
   @override
   Widget build(BuildContext context) {
-    Widget page;
-    switch (pageIndex) {
-      case 0:
-        page = const HomePage();
-        break;
-      case 1:
-        page = const SavingsPage();
-        break;
-      case 2:
-        page = const ExpensesPage();
-        break;
-      case 3:
-        page = const AlertsPage();
-        break;
-      case 4:
-        page = const AccountPage();
-        break;
-      default:
-        throw UnimplementedError('no widget for $pageIndex');
-    }
+    List<Widget> pages = [
+      const HomePage(),
+      const SavingsPage(),
+      const ExpensesPage(),
+      const AlertsPage(),
+      const AccountPage(),
+    ];
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         if (constraints.maxWidth < 600) {
           return Scaffold(
-            body: page,
+            body: PageView(
+              controller: _pageController,
+              children: pages,
+              onPageChanged: (index) {
+                onDestinationSelected(index);
+              },
+            ),
             bottomNavigationBar: NavigationBar(
               labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
               selectedIndex: pageIndex,
-              onDestinationSelected: onDestinationSelected,
+              onDestinationSelected: (index) {
+                _pageController.animateToPage(
+                  index,
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                );
+              },
               destinations: NavigationDestinations.getMobileDestinations(),
             ),
           );
@@ -61,12 +61,24 @@ class ResponsiveLayout extends StatelessWidget {
                   labelType: NavigationRailLabelType.all,
                   destinations: NavigationDestinations.getDestinations(),
                   selectedIndex: pageIndex,
-                  onDestinationSelected: onDestinationSelected,
+                  onDestinationSelected: (index) {
+                    _pageController.animateToPage(
+                      index,
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeInOut,
+                    );
+                  },
                 ),
                 Expanded(
                   child: Container(
                     color: Theme.of(context).colorScheme.primaryContainer,
-                    child: page,
+                    child: PageView(
+                      controller: _pageController,
+                      children: pages,
+                      onPageChanged: (index) {
+                        onDestinationSelected(index);
+                      },
+                    ),
                   ),
                 ),
               ],

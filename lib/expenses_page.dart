@@ -103,12 +103,20 @@ class ExpensesPage extends StatelessWidget {
   }
 }
 
-class AddExpensePage extends StatelessWidget {
+class AddExpensePage extends StatefulWidget {
+  AddExpensePage({super.key});
+
+  @override
+  _AddExpensePageState createState() => _AddExpensePageState();
+}
+
+class _AddExpensePageState extends State<AddExpensePage> {
   final TextEditingController _itemController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _categoryController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  String? _selectedCategory;
 
-  AddExpensePage({super.key});
+  final List<String> _categories = ['Food', 'Transportation', 'Miscellaneous'];
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +125,7 @@ class AddExpensePage extends StatelessWidget {
         title: const Text('Add Expense'),
       ),
       body: Form(
+        key: _formKey,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -142,33 +151,51 @@ class AddExpensePage extends StatelessWidget {
                   return null;
                 },
               ),
-              TextFormField(
-                controller: _categoryController,
+              DropdownButtonFormField(
+                value: _selectedCategory,
+                items: _categories.map((category) {
+                  return DropdownMenuItem(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  setState(() {
+                    _selectedCategory = value ?? _selectedCategory;
+                  });
+                },
                 decoration: const InputDecoration(labelText: 'Category'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a category';
+                    return 'Please select a category';
                   }
                   return null;
                 },
               ),
-              ElevatedButton(
-                onPressed: () {
-                  if (Form.of(context).validate()) {
-                    final expense = Expense(
-                      item: _itemController.text,
-                      price: double.parse(_priceController.text),
-                      category: _categoryController.text,
-                    );
-                    Provider.of<MyAppState>(context, listen: false).addExpense(expense);
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: const Text('Save'),
-              ),
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            if (_selectedCategory == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Please select a category')),
+              );
+              return;
+            }
+            final expense = Expense(
+              item: _itemController.text,
+              price: double.parse(_priceController.text),
+              category: _selectedCategory!,
+            );
+            Provider.of<MyAppState>(context, listen: false).addExpense(expense);
+            Navigator.of(context).pop();
+          }
+        },
+        label: const Text('Save'),
+        icon: const Icon(Icons.save),
       ),
     );
   }

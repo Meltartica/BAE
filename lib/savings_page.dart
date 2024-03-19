@@ -1,119 +1,221 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'main.dart';
 import 'functions.dart';
-
-class Transaction {
-  final String description;
-  final double amount;
-
-  Transaction({required this.description, required this.amount});
-}
+import 'main.dart';
 
 class SavingsPage extends StatelessWidget {
   const SavingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
+    return ChangeNotifierProvider(
+      create: (context) => SavingsModel(),
+      child: Consumer<SavingsModel>(
+        builder: (context, model, child) {
+          return DefaultTabController(
+            length: 3, // number of tabs
+            child: Scaffold(
+              appBar: PreferredSize(
+                preferredSize: const Size.fromHeight(70),
+                child: AppBarBuilder.buildAppBar('Savings'),
+              ),
+              body: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  double boxWidth = constraints.maxWidth * 0.975;
 
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(70),
-        child: AppBarBuilder.buildAppBar('Savings'),
-      ),
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          return Padding(
-            padding: EdgeInsets.only(top: constraints.maxHeight * 0.01),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: SizedBox(
-                width: constraints.maxWidth * 0.975,
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Total Savings: \$${appState.totalSavings.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 20),
+                  return Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: SizedBox(
+                          width: boxWidth,
+                          child: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                'Total Amount: \$${model.totalSavings.toStringAsFixed(2)}',
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Text(
+                          'Transactions',
+                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: model.transactions.length,
+                          itemBuilder: (context, index) {
+                            final transaction = model.transactions[index];
+                            return ListTile(
+                              title: Text(transaction['name']),
+                              subtitle: Text(transaction['description']),
+                              trailing: Text('\$${transaction['amount'].toStringAsFixed(2)}'),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              floatingActionButton: FloatingActionButton.extended(
+                onPressed: () async {
+                  final newTransaction = await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const AddTransactionPage(),
                     ),
-                  ),
-                ),
+                  );
+                  if (newTransaction != null) {
+                    model.addTransaction(context, newTransaction);
+                  }
+                },
+                label: const Text('Add'),
+                icon: const Icon(Icons.add),
               ),
             ),
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          final newTransaction = await Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => AddTransactionPage()),
-          );
-          if (newTransaction != null) {
-            appState.addTransaction(newTransaction);
-          }
-        },
-        label: const Text('Add'),
-        icon: const Icon(Icons.add),
-      ),
     );
   }
 }
 
-class AddTransactionPage extends StatelessWidget {
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _amountController = TextEditingController();
+class SavingsModel extends ChangeNotifier {
+  double _totalSavings = 0;
+  final List<Map<String, dynamic>> _transactions = [];
 
-  AddTransactionPage({super.key});
+  double get totalSavings => _totalSavings;
+  List<Map<String, dynamic>> get transactions => _transactions;
+
+  void subtractSavings(double amount) {
+    _totalSavings -= amount;
+    notifyListeners();
+  }
+
+  void addTransaction(BuildContext context, Map<String, dynamic> transaction) {
+    _transactions.add(transaction);
+    _totalSavings += transaction['amount'];
+    Provider.of<MyAppState>(context, listen: false).addSavings(transaction['amount']);
+    notifyListeners();
+  }
+}
+
+class AddTransactionPage extends StatefulWidget {
+  const AddTransactionPage({super.key});
+
+  @override
+  _AddTransactionPageState createState() => _AddTransactionPageState();
+}
+
+class _AddTransactionPageState extends State<AddTransactionPage> {
+  final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Transaction'),
       ),
       body: Form(
+        key: _formKey,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: <Widget>[
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Description'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a description';
-                  }
-                  return null;
-                },
+              Container(
+                width: screenWidth * 0.975,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                child: TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Name',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(10),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a name';
+                    }
+                    return null;
+                  },
+                ),
               ),
-              TextFormField(
-                controller: _amountController,
-                decoration: const InputDecoration(labelText: 'Amount'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter an amount';
-                  }
-                  return null;
-                },
+              const SizedBox(height: 10),
+              Container(
+                width: screenWidth * 0.975,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                child: TextFormField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(10),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a description';
+                    }
+                    return null;
+                  },
+                ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  if (Form.of(context).validate()) {
-                    final transaction = Transaction(
-                      description: _descriptionController.text,
-                      amount: double.parse(_amountController.text),
-                    );
-                    Provider.of<MyAppState>(context, listen: false).addTransaction(transaction);
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: const Text('Save'),
+              const SizedBox(height: 10),
+              Container(
+                width: screenWidth * 0.975,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                child: TextFormField(
+                  controller: _amountController,
+                  decoration: const InputDecoration(
+                    labelText: 'Amount',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(10),
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter an amount';
+                    }
+                    return null;
+                  },
+                ),
               ),
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            final transaction = {
+              'name': _nameController.text,
+              'description': _descriptionController.text,
+              'amount': double.parse(_amountController.text),
+            };
+            Navigator.of(context).pop(transaction);
+          }
+        },
+        label: const Text('Save'),
+        icon: const Icon(Icons.save),
       ),
     );
   }
