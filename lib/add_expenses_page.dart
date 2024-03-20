@@ -183,7 +183,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     suffixIcon: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.only(right:8.0),
                       child: IconButton(
                         icon: const Icon(Icons.calendar_today),
                         onPressed: () async {
