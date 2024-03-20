@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:provider/provider.dart';
-import 'main.dart';
+import 'package:intl/intl.dart';
+import 'add_expenses_page.dart';
 import 'functions.dart';
+import 'main.dart';
 
 class Expense {
   final String item;
   final double price;
   final String category;
+  final DateTime date;
 
-  Expense({required this.item, required this.price, required this.category});
+  Expense({required this.item, required this.price, required this.category, required this.date});
 }
 
 class ExpensesPage extends StatelessWidget {
@@ -98,13 +101,16 @@ class ExpensesPage extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.all(16.0),
+                                      padding: const EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0, bottom: 8.0),
                                       child: Text(
                                         entry.key,
-                                        style: const TextStyle(fontSize: 20),
+                                        style: const TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
-                                    const Divider(color: Colors.grey), // Added Divider here
+                                    const Divider(color: Colors.grey),
                                     ListView.builder(
                                       shrinkWrap: true,
                                       physics: const NeverScrollableScrollPhysics(),
@@ -112,6 +118,7 @@ class ExpensesPage extends StatelessWidget {
                                       itemBuilder: (context, index) {
                                         return ListTile(
                                           title: Text('${entry.value[index].item} - \$${entry.value[index].price.toStringAsFixed(2)}'),
+                                          subtitle: Text('Date: ${DateFormat('MMMM d, yyyy').format(entry.value[index].date)}'),
                                           trailing: IconButton(
                                             icon: const Icon(Icons.edit),
                                             onPressed: () {
@@ -148,165 +155,6 @@ class ExpensesPage extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class AddExpensePage extends StatefulWidget {
-  const AddExpensePage({super.key});
-
-  @override
-  _AddExpensePageState createState() => _AddExpensePageState();
-}
-
-class _AddExpensePageState extends State<AddExpensePage> {
-  final TextEditingController _itemController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _categoryController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-  String? _selectedCategory;
-
-  final List<String> _categories = ['Food', 'Transportation', 'Miscellaneous', 'Utilities', 'Rent', 'Entertainment', 'Clothing', 'Health', 'Insurance', 'Education'];
-
-  bool _isBottomSheetOpen = false;
-
-  void showBottomSheet(BuildContext context, Function(String) onItemSelected) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return ListView.builder(
-          itemCount: _categories.length,
-          itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-              title: Text(_categories[index]),
-              onTap: () {
-                onItemSelected(_categories[index]);
-                Navigator.of(context).pop();
-              },
-            );
-          },
-        );
-      },
-    ).then((value) {
-      setState(() {
-        _isBottomSheetOpen = false;
-      });
-    });
-
-    setState(() {
-      _isBottomSheetOpen = true;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Expense'),
-      ),
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: _itemController,
-                  decoration: InputDecoration(
-                    labelText: 'Item',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0), // Add this
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter an item name';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: _priceController,
-                  decoration: InputDecoration(
-                    labelText: 'Price',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0), // Add this
-                    ),
-                  ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a price';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  readOnly: true,
-                  controller: _categoryController,
-                  decoration: InputDecoration(
-                    labelText: 'Category',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    suffixIcon: Padding(
-                      padding: const EdgeInsets.all(8.0), // Add your desired padding here
-                      child: IconButton(
-                        icon: Icon(_isBottomSheetOpen ? Icons.arrow_drop_up : Icons.arrow_drop_down),
-                        onPressed: () {
-                          showBottomSheet(context, (selectedCategory) {
-                            _categoryController.text = selectedCategory;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                  onTap: () {
-                    showBottomSheet(context, (selectedCategory) {
-                      _categoryController.text = selectedCategory;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select a category';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            if (_selectedCategory == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Please select a category')),
-              );
-              return;
-            }
-            final expense = Expense(
-              item: _itemController.text,
-              price: double.parse(_priceController.text),
-              category: _selectedCategory!,
-            );
-            Provider.of<MyAppState>(context, listen: false).addExpense(expense);
-            Navigator.of(context).pop();
-          }
-        },
-        label: const Text('Save'),
-        icon: const Icon(Icons.save),
-      ),
     );
   }
 }
