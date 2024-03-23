@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'navigation_destinations.dart';
 import 'home_page.dart';
-import 'savings_page.dart';
 import 'account_page.dart';
 import 'alerts_page.dart';
-import 'expenses_page.dart';
+import 'overview_page.dart';
+import 'benefits_page.dart';
 
 class ResponsiveLayout extends StatelessWidget {
   final int pageIndex;
@@ -21,8 +21,8 @@ class ResponsiveLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> pages = [
       const HomePage(),
-      const SavingsPage(),
-      const ExpensesPage(),
+      const BenefitsPage(),
+      const OverviewPage(),
       const AlertsPage(),
       const AccountPage(),
     ];
@@ -37,6 +37,7 @@ class ResponsiveLayout extends StatelessWidget {
               onPageChanged: (index) {
                 onDestinationSelected(index);
               },
+              physics: const NeverScrollableScrollPhysics(),
             ),
             bottomNavigationBar: NavigationBar(
               labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
@@ -44,7 +45,7 @@ class ResponsiveLayout extends StatelessWidget {
               onDestinationSelected: (index) {
                 _pageController.animateToPage(
                   index,
-                  duration: const Duration(milliseconds: 300),
+                  duration: const Duration(milliseconds: 1000),
                   curve: Curves.easeInOut,
                 );
               },
@@ -64,7 +65,7 @@ class ResponsiveLayout extends StatelessWidget {
                   onDestinationSelected: (index) {
                     _pageController.animateToPage(
                       index,
-                      duration: const Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 1000),
                       curve: Curves.easeInOut,
                     );
                   },
@@ -77,6 +78,7 @@ class ResponsiveLayout extends StatelessWidget {
                       onPageChanged: (index) {
                         onDestinationSelected(index);
                       },
+                      physics: const NeverScrollableScrollPhysics(),
                       scrollDirection: Axis.vertical,
                       children: pages, // Add this line
                     ),

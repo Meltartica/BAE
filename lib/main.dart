@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'layout_builder_module.dart';
-import 'expenses_page.dart';
+import 'home_page.dart';
+import 'benefits_page.dart';
 
 void main() {
   runApp(
@@ -64,17 +65,15 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  final List<Expense> _expenses = [];
-
-  List<Expense> get expenses => _expenses;
+  late final List<Expense> expenses = [];
 
   void addExpense(Expense expense) {
-    _expenses.add(expense);
+    expenses.add(expense);
     notifyListeners();
   }
 
   void deleteExpense(Expense expense) {
-    _expenses.remove(expense);
+    expenses.remove(expense);
     notifyListeners();
   }
 
@@ -83,6 +82,28 @@ class MyAppState extends ChangeNotifier {
 
   void addSavings(double amount) {
     _savings += amount;
+    notifyListeners();
+  }
+
+  Map<String, double> categoryLimits = {};
+  double generalLimit = 0.0;
+
+  void setCategoryLimit(String category, double limit) {
+    categoryLimits[category] = limit;
+    notifyListeners();
+  }
+
+  void setGeneralLimit(double limit) {
+    generalLimit = limit;
+    notifyListeners();
+  }
+
+  final List<Benefit> _benefits = [];
+
+  List<Benefit> get benefits => _benefits;
+
+  void addBenefit(Benefit benefit) {
+    _benefits.add(benefit);
     notifyListeners();
   }
 }

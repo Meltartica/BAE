@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'expenses_page.dart';
+import 'package:intl/intl.dart';
+import 'home_page.dart';
 import 'main.dart';
 
 class AddExpensePage extends StatefulWidget {
@@ -11,15 +12,19 @@ class AddExpensePage extends StatefulWidget {
 }
 
 class _AddExpensePageState extends State<AddExpensePage> {
+  String _type = 'Income';
+
   final TextEditingController _itemController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _categoryController = TextEditingController();
-  final TextEditingController _otherCategoryController = TextEditingController();
+  final TextEditingController _otherCategoryController =
+      TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   bool _isOtherCategorySelected = false;
   final _formKey = GlobalKey<FormState>();
   String? _selectedCategory;
   DateTime _selectedDate = DateTime.now();
+  DateTime _selectedTime = DateTime.now();
 
   @override
   void initState() {
@@ -27,7 +32,19 @@ class _AddExpensePageState extends State<AddExpensePage> {
     _dateController.text = _selectedDate.toIso8601String().substring(0, 10);
   }
 
-  final List<String> _categories = ['Food', 'Transportation', 'Miscellaneous', 'Utilities', 'Rent', 'Entertainment', 'Clothing', 'Health', 'Insurance', 'Education','Others'];
+  final List<String> _categories = [
+    'Food',
+    'Transportation',
+    'Miscellaneous',
+    'Utilities',
+    'Rent',
+    'Entertainment',
+    'Clothing',
+    'Health',
+    'Insurance',
+    'Education',
+    'Others'
+  ];
 
   bool _isBottomSheetOpen = false;
 
@@ -57,8 +74,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
               );
             },
           );
-        }
-    ).then((value) {
+        }).then((value) {
       setState(() {
         _isBottomSheetOpen = false;
       });
@@ -73,7 +89,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Expense'),
+        title: const Text('Add Transaction'),
       ),
       body: Form(
         key: _formKey,
@@ -81,6 +97,55 @@ class _AddExpensePageState extends State<AddExpensePage> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _type = 'Income';
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(50, 50),
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        side: _type == 'Income'
+                            ? const BorderSide(
+                                color: Colors.blue,
+                                width: 2,
+                              )
+                            : null,
+                      ),
+                      child: const Text('Income'),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _type = 'Expense';
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(50, 50),
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        side: _type == 'Expense'
+                            ? const BorderSide(
+                                color: Colors.blue,
+                                width: 2,
+                              )
+                            : null,
+                      ),
+                      child: const Text('Expense'),
+                    ),
+                  ),
+                ],
+              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
@@ -131,7 +196,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     suffixIcon: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: IconButton(
-                        icon: Icon(_isBottomSheetOpen ? Icons.arrow_drop_up : Icons.arrow_drop_down),
+                        icon: Icon(_isBottomSheetOpen
+                            ? Icons.arrow_drop_up
+                            : Icons.arrow_drop_down),
                         onPressed: () {
                           showBottomSheet(context, (selectedCategory) {
                             _categoryController.text = selectedCategory;
@@ -174,49 +241,76 @@ class _AddExpensePageState extends State<AddExpensePage> {
                 ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: _dateController,
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    labelText: 'Date',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    suffixIcon: Padding(
-                      padding: const EdgeInsets.only(right:8.0),
-                      child: IconButton(
-                        icon: const Icon(Icons.calendar_today),
-                        onPressed: () async {
-                          final date = await showDatePicker(
-                            context: context,
-                            initialDate: _selectedDate,
-                            firstDate: DateTime(DateTime.now().year - 5),
-                            lastDate: DateTime(DateTime.now().year + 5),
-                          );
-                          if (date != null) {
-                            setState(() {
-                              _selectedDate = date;
-                              _dateController.text = date.toIso8601String().substring(0, 10);
-                            });
-                          }
-                        },
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.85 / 2,
+                        child: Card(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.calendar_today,
+                              size: 18,
+                            ),
+                            title: Text(
+                              DateFormat('MM/dd/yyyy').format(_selectedDate),
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            onTap: () async {
+                              final date = await showDatePicker(
+                                context: context,
+                                initialDate: _selectedDate,
+                                firstDate: DateTime(DateTime.now().year - 5),
+                                lastDate: DateTime(DateTime.now().year + 5),
+                              );
+                              if (date != null) {
+                                setState(() {
+                                  _selectedDate = date;
+                                });
+                              }
+                            },
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 8.0),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.85 / 2,
+                        child: Card(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.access_time,
+                              size: 18,
+                            ),
+                            title: Text(
+                              DateFormat('hh:mm a').format(_selectedTime),
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            onTap: () async {
+                              final time = await showTimePicker(
+                                context: context,
+                                initialTime:
+                                    TimeOfDay.fromDateTime(_selectedTime),
+                              );
+                              if (time != null) {
+                                setState(() {
+                                  _selectedTime = DateTime(
+                                    _selectedDate.year,
+                                    _selectedDate.month,
+                                    _selectedDate.day,
+                                    time.hour,
+                                    time.minute,
+                                  );
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  onTap: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      initialDate: _selectedDate,
-                      firstDate: DateTime(DateTime.now().year - 5),
-                      lastDate: DateTime(DateTime.now().year + 5),
-                    );
-                    if (date != null) {
-                      setState(() {
-                        _selectedDate = date;
-                        _dateController.text = date.toIso8601String().substring(0, 10);
-                      });
-                    }
-                  },
                 ),
               ),
             ],
@@ -240,6 +334,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
               price: double.parse(_priceController.text),
               category: _selectedCategory!,
               date: _selectedDate,
+              type: _type,
             );
             Provider.of<MyAppState>(context, listen: false).addExpense(expense);
             Navigator.of(context).pop();

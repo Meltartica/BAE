@@ -7,31 +7,31 @@ class NavigationDestinations {
     return const [
       NavigationRailDestination(
         icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home),
+        selectedIcon: Icon(Icons.home_rounded),
         label: Text('Home'),
         padding: paddingValue,
       ),
       NavigationRailDestination(
-        icon: Icon(Icons.savings_outlined),
-        selectedIcon: Icon(Icons.savings),
-        label: Text('Savings'),
+        icon: Icon(Icons.paid_outlined),
+        selectedIcon: Icon(Icons.paid_rounded),
+        label: Text('Benefits'),
         padding: paddingValue,
       ),
       NavigationRailDestination(
-        icon: Icon(Icons.payments_outlined),
-        selectedIcon: Icon(Icons.payments),
-        label: Text('Expenses'),
+        icon: Icon(Icons.sort_outlined),
+        selectedIcon: Icon(Icons.sort_rounded),
+        label: Text('Overview'),
         padding: paddingValue,
       ),
       NavigationRailDestination(
         icon: Icon(Icons.notifications_outlined),
-        selectedIcon: Icon(Icons.notifications),
+        selectedIcon: Icon(Icons.notifications_rounded),
         label: Text('Alerts'),
         padding: paddingValue,
       ),
       NavigationRailDestination(
         icon: Icon(Icons.person_outline),
-        selectedIcon: Icon(Icons.person),
+        selectedIcon: Icon(Icons.person_rounded),
         label: Text('Account'),
         padding: paddingValue,
       ),
@@ -42,27 +42,27 @@ class NavigationDestinations {
     return const [
       NavigationDestination(
         icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home),
+        selectedIcon: Icon(Icons.home_rounded),
         label: 'Home',
       ),
       NavigationDestination(
-        icon: Icon(Icons.savings_outlined),
-        selectedIcon: Icon(Icons.savings),
-        label: 'Savings',
+        icon: Icon(Icons.paid_outlined),
+        selectedIcon: Icon(Icons.paid_rounded),
+        label: 'Benefits',
       ),
       NavigationDestination(
-        icon: Icon(Icons.payments_outlined),
-        selectedIcon: Icon(Icons.payments),
-        label: 'Expenses',
+        icon: Icon(Icons.sort_outlined),
+        selectedIcon: Icon(Icons.sort),
+        label: 'Overview',
       ),
       NavigationDestination(
         icon: Icon(Icons.notifications_outlined),
-        selectedIcon: Icon(Icons.notifications),
+        selectedIcon: Icon(Icons.notifications_rounded),
         label: 'Alerts',
       ),
       NavigationDestination(
         icon: Icon(Icons.person_outline),
-        selectedIcon: Icon(Icons.person),
+        selectedIcon: Icon(Icons.person_rounded),
         label: 'Account',
       ),
     ];
