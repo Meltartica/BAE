@@ -20,6 +20,22 @@ class Expense {
     required this.date,
     required this.type,
   });
+
+  Map<String, dynamic> toJson() => {
+        'item': item,
+        'price': price,
+        'category': category,
+        'date': date.toIso8601String(),
+        'type': type,
+      };
+
+  factory Expense.fromJson(Map<String, dynamic> json) => Expense(
+        item: json['item'],
+        price: json['price'],
+        category: json['category'],
+        date: DateTime.parse(json['date']),
+        type: json['type'],
+      );
 }
 
 class HomePage extends StatefulWidget {
@@ -444,6 +460,7 @@ class _HomePageState extends State<HomePage> {
             }),
           ),
           floatingActionButton: FloatingActionButton.extended(
+            heroTag: 'addExpense',
             onPressed: () async {
               final newExpense = await Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => const AddExpensePage()),

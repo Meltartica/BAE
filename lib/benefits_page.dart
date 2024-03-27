@@ -24,6 +24,30 @@ class Benefit {
     required this.selectedDate,
     required this.selectedTime,
   });
+
+  // Convert a Benefit object into a Map
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'description': description,
+      'amount': amount,
+      'image': image?.path,
+      'selectedDate': selectedDate.toIso8601String(),
+      'selectedTime': selectedTime.toIso8601String(),
+    };
+  }
+
+  // Create a Benefit object from a Map
+  factory Benefit.fromJson(Map<String, dynamic> json) {
+    return Benefit(
+      title: json['title'],
+      description: json['description'],
+      amount: json['amount'],
+      image: json['image'] != null ? XFile(json['image']) : null,
+      selectedDate: DateTime.parse(json['selectedDate']),
+      selectedTime: DateTime.parse(json['selectedTime']),
+    );
+  }
 }
 
 class BenefitsPage extends StatelessWidget {
@@ -80,6 +104,7 @@ class BenefitsPage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'addBenefits',
         onPressed: () {
           Navigator.push(
             context,
@@ -108,38 +133,41 @@ class BenefitCard extends StatelessWidget {
             child: SizedBox(
               width: constraints.maxWidth * 0.975,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: ListTile(
-                          title: Text(
-                            benefit.title,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          subtitle: Text(
-                            benefit.description,
-                            textAlign: TextAlign.justify,
-                          ),
+                      Text(
+                        benefit.title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        'Amount: \n\u20B1${benefit.amount.toStringAsFixed(2)}',
+                        DateFormat('HH:mm a').format(benefit.selectedTime),
+                        style: const TextStyle(
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
+                  Text(
+                    benefit.description,
+                    style: const TextStyle(
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.justify,
+                  ),
+                  const SizedBox(height: 16),
                   if (benefit.image != null)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8.0),
                       child: Image.file(
                         File(benefit.image!.path),
                         width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.scaleDown,
                       ),
                     ),
                 ],
@@ -185,6 +213,12 @@ class _AddBenefitsPageState extends State<AddBenefitsPage> {
     }
   }
 
+  void removeImage() {
+    setState(() {
+      image = null;
+    });
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -201,7 +235,7 @@ class _AddBenefitsPageState extends State<AddBenefitsPage> {
       ),
       body: Form(
         key: _formKey,
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             children: <Widget>[
@@ -266,27 +300,94 @@ class _AddBenefitsPageState extends State<AddBenefitsPage> {
                         },
                       ),
                     ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.85,
-                      child: TextButton(
-                        onPressed: pickImage,
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 20.0, horizontal: 50.0),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
+                    if (image == null)
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 8, right: 8, bottom: 8.0),
+                        child: TextButton(
+                          onPressed: pickImage,
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20.0, horizontal: 50.0),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primaryContainer,
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.image),
+                              Text('Pick Image'),
+                            ],
+                          ),
                         ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.image),
-                            Text('Pick Image'),
-                          ],
+                      )
+                    else
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4, right: 4, bottom: 8.0),
+                        child: SizedBox(
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    return Card(
+                                      color: Theme.of(context).colorScheme.primaryContainer,
+                                      child: Column(
+                                        children: [
+                                          const Padding(
+                                            padding: EdgeInsets.all(8.0),
+                                            child: Text(
+                                              'Selected Image',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          if (image != null)
+                                            ClipRRect(
+                                              borderRadius: BorderRadius.circular(8.0),
+                                              child: Image.file(
+                                                File(image!.path),
+                                                width: constraints.maxWidth * 0.975,
+                                                fit: BoxFit.scaleDown,
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 4, right: 4),
+                                child: TextButton(
+                                  onPressed: removeImage,
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 20.0, horizontal: 50.0),
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                  ),
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.image),
+                                      Text('Remove Image'),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
-                    ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.only(
+                          left: 8, right: 8, bottom: 8.0),
                       child: Center(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,

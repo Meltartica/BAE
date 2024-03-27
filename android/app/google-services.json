@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "993630734123",
+    "project_id": "benefits-at-ease",
+    "storage_bucket": "benefits-at-ease.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:993630734123:android:eaa5034e194e331c34676e",
+        "android_client_info": {
+          "package_name": "com.bae.bae"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "993630734123-18nkq81h3nf7g9fd5ptn0u3cu15qk936.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBejqsYOXGw5c2Z9n9X0M6uKUTqmLwM01I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "993630734123-18nkq81h3nf7g9fd5ptn0u3cu15qk936.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "993630734123-3u67o6v2a1fnbukkksq349nfo7hsd28u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.bae.bae.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

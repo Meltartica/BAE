@@ -150,3 +150,39 @@ void showCustomBottomSheet(BuildContext context, int index, Map<int, String> not
     },
   );
 }
+
+void showSimpleDialog(BuildContext context, String title, String notifications) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Container(
+          constraints: const BoxConstraints(
+            maxWidth: 500,
+            maxHeight: 500,
+          ),
+          child: Text(
+            notifications,
+            textAlign: TextAlign.justify,
+          ),
+        ),
+        actions: <Widget>[
+          ElevatedButton.icon(
+            icon: const Icon(Icons.close),
+            label: const Text('OK'),
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(
+                  Theme.of(context).colorScheme.onPrimary),
+              foregroundColor: MaterialStateProperty.all<Color>(
+                  Theme.of(context).colorScheme.secondary),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}

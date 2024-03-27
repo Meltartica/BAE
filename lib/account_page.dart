@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'functions.dart';
 import 'main.dart';
+import 'login_page.dart';
 
 class AccountPage extends StatelessWidget {
   const AccountPage({super.key});
@@ -86,6 +87,32 @@ class AccountPage extends StatelessWidget {
                                 },
                               );
                             },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth * 0.975,
+                    height: constraints.maxHeight * 0.15,
+                    child: Card(
+                      child: Center(
+                        child: ListTile(
+                          leading: const Icon(Icons.logout),
+                          title: const Text('Sign Out'),
+                          trailing: SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: FloatingActionButton(
+                              child: const Icon(Icons.logout),
+                              onPressed: () {
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                    builder: (context) => const LoginPage(),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
