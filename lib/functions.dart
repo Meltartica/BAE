@@ -4,7 +4,6 @@ import 'main.dart';
 
 // Edit Profile Dialog That is used in the Account Page
 class EditProfileDialog extends StatelessWidget {
-  final TextEditingController _profileImageUrlController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
 
   EditProfileDialog({super.key});
@@ -16,12 +15,6 @@ class EditProfileDialog extends StatelessWidget {
       content: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            TextField(
-              controller: _profileImageUrlController,
-              decoration: const InputDecoration(
-                hintText: 'Enter new profile picture URL',
-              ),
-            ),
             TextField(
               controller: _usernameController,
               decoration: const InputDecoration(
@@ -35,9 +28,9 @@ class EditProfileDialog extends StatelessWidget {
         TextButton(
           child: const Text('Change'),
           onPressed: () {
-            String newProfileImageUrl = _profileImageUrlController.text;
             String newUsername = _usernameController.text;
-            Provider.of<MyAppState>(context, listen: false).updateProfile(newProfileImageUrl, newUsername);
+            Provider.of<MyAppState>(context, listen: false).updateProfile(newUsername);
+            Navigator.of(context).pop();
           },
         ),
       ],
@@ -184,5 +177,30 @@ void showSimpleDialog(BuildContext context, String title, String notifications) 
         ],
       );
     },
+  );
+}
+
+Widget createSortButton(BuildContext context, String label, String sortType) {
+  var appState = Provider.of<MyAppState>(context, listen: false);
+  bool isSelected = appState.selectedButton == sortType;
+
+  return Padding(
+    padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+    child: ElevatedButton(
+      onPressed: () {
+        appState.updateSelectedButton(sortType);
+      },
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(50, 50),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        side: isSelected
+            ? const BorderSide(
+          color: Colors.blue,
+          width: 2,
+        )
+            : null,
+      ),
+      child: Text(label),
+    ),
   );
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'navigation_destinations.dart';
-import 'home_page.dart';
-import 'account_page.dart';
-import 'alerts_page.dart';
-import 'overview_page.dart';
-import 'benefits_page.dart';
+import '../pages/home_page.dart';
+import '../pages/account_page.dart';
+import '../pages/alerts_page.dart';
+import '../pages/overview_page.dart';
+import '../pages/benefits_page.dart';
 
 class ResponsiveLayout extends StatelessWidget {
   final int pageIndex;
@@ -33,21 +33,17 @@ class ResponsiveLayout extends StatelessWidget {
           return Scaffold(
             body: PageView(
               controller: _pageController,
-              children: pages,
               onPageChanged: (index) {
                 onDestinationSelected(index);
               },
               physics: const NeverScrollableScrollPhysics(),
+              children: pages,
             ),
             bottomNavigationBar: NavigationBar(
               labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
               selectedIndex: pageIndex,
               onDestinationSelected: (index) {
-                _pageController.animateToPage(
-                  index,
-                  duration: const Duration(milliseconds: 1000),
-                  curve: Curves.easeInOut,
-                );
+                _pageController.jumpToPage(index);
               },
               destinations: NavigationDestinations.getMobileDestinations(),
             ),
@@ -63,11 +59,7 @@ class ResponsiveLayout extends StatelessWidget {
                   destinations: NavigationDestinations.getDestinations(),
                   selectedIndex: pageIndex,
                   onDestinationSelected: (index) {
-                    _pageController.animateToPage(
-                      index,
-                      duration: const Duration(milliseconds: 1000),
-                      curve: Curves.easeInOut,
-                    );
+                    _pageController.jumpToPage(index);
                   },
                 ),
                 Expanded(
@@ -80,7 +72,7 @@ class ResponsiveLayout extends StatelessWidget {
                       },
                       physics: const NeverScrollableScrollPhysics(),
                       scrollDirection: Axis.vertical,
-                      children: pages, // Add this line
+                      children: pages,
                     ),
                   ),
                 ),

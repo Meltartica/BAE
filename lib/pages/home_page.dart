@@ -1,10 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../lists/expenses_list.dart';
 import 'package:intl/intl.dart';
-import 'add_expenses_page.dart';
-import 'functions.dart';
-import 'main.dart';
+import '../input_pages/add_expenses_page.dart';
+import '../functions.dart';
+import '../main.dart';
 
 class Expense {
   final String item;
@@ -42,11 +43,12 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   String? selectedCategory;
+  String selectedButton = 'All';
 
   @override
   Widget build(BuildContext context) {
@@ -60,8 +62,39 @@ class _HomePageState extends State<HomePage> {
             .fold(0, (prev, element) => prev + element.price);
         double totalBalance = totalIncome - totalSpent;
 
-        final expensesByDate = groupBy(appState.expenses, (Expense e) {
+        final groupedExpenses = groupBy(appState.expenses, (Expense e) {
           return DateFormat('MMMM dd, yyyy').format(e.date);
+        });
+
+        final filteredExpenses =
+            Map.fromEntries(groupedExpenses.entries.where((entry) {
+          var entryDate = DateFormat('MMMM dd, yyyy').parse(entry.key);
+          if (appState.selectedButton == 'All') {
+            return true;
+          } else if (appState.selectedButton == 'Daily') {
+            return entryDate.day == DateTime.now().day &&
+                entryDate.month == DateTime.now().month &&
+                entryDate.year == DateTime.now().year;
+          } else if (appState.selectedButton == 'Weekly') {
+            return entryDate
+                .isAfter(DateTime.now().subtract(const Duration(days: 7)));
+          } else if (appState.selectedButton == 'Monthly') {
+            return entryDate.month == DateTime.now().month &&
+                entryDate.year == DateTime.now().year;
+          } else if (appState.selectedButton == 'Yearly') {
+            return entryDate.year == DateTime.now().year;
+          } else {
+            return false;
+          }
+        }));
+
+        final expensesByDate = filteredExpenses.entries.toList();
+
+        // Sort the expenses by date in descending order (from now to before)
+        expensesByDate.sort((a, b) {
+          DateTime dateA = DateFormat('MMMM dd, yyyy').parse(a.key);
+          DateTime dateB = DateFormat('MMMM dd, yyyy').parse(b.key);
+          return dateB.compareTo(dateA);
         });
 
         String getGreeting() {
@@ -312,12 +345,32 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            'Transactions',
-                            style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 16.0, top: 8, bottom: 8.0),
+                          child: SizedBox(
+                            width: cardWidth,
+                            child: const Text(
+                              'Transactions',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                createSortButton(context, 'All', 'All'),
+                                createSortButton(context, 'Daily', 'Daily'),
+                                createSortButton(context, 'Weekly', 'Weekly'),
+                                createSortButton(context, 'Monthly', 'Monthly'),
+                                createSortButton(context, 'Yearly', 'Yearly'),
+                              ],
+                            ),
                           ),
                         ),
                         if (appState.expenses.isEmpty)
@@ -344,114 +397,9 @@ class _HomePageState extends State<HomePage> {
                           )
                         else
                           Column(
-                            children: expensesByDate.entries.map((entry) {
-                              // Filter the expenses by the selected category
-                              var expensesForDateAndCategory =
-                                  entry.value.where((Expense expense) {
-                                return selectedCategory == null ||
-                                    expense.category == selectedCategory;
-                              }).toList();
-
-                              if (expensesForDateAndCategory.isEmpty) {
-                                return Container();
-                              }
-
-                              // Calculate total income and expense for the date
-                              double totalIncomeForDate =
-                                  expensesForDateAndCategory
-                                      .where(
-                                          (expense) => expense.type == 'Income')
-                                      .fold(
-                                          0,
-                                          (prev, element) =>
-                                              prev + element.price);
-                              double totalExpenseForDate =
-                                  expensesForDateAndCategory
-                                      .where(
-                                          (expense) => expense.type != 'Income')
-                                      .fold(
-                                          0,
-                                          (prev, element) =>
-                                              prev + element.price);
-
-                              return Column(
-                                children: [
-                                  SizedBox(
-                                    width: cardWidth,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            entry.key,
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            (totalIncomeForDate -
-                                                        totalExpenseForDate) >=
-                                                    0
-                                                ? '\u20B1${(totalIncomeForDate - totalExpenseForDate).toStringAsFixed(2)}'
-                                                : '-\u20B1${(totalExpenseForDate - totalIncomeForDate).toStringAsFixed(2)}',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: (totalIncomeForDate -
-                                                          totalExpenseForDate) >=
-                                                      0
-                                                  ? Colors.green
-                                                  : Colors.red,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  ...expensesForDateAndCategory
-                                      .map((Expense expense) {
-                                    return SizedBox(
-                                      width: cardWidth,
-                                      child: Card(
-                                          child: ListTile(
-                                        title: Text(expense.item),
-                                        subtitle: Text(
-                                            '${expense.category} \u00B7 ${DateFormat('hh:mm a').format(expense.date)} \u00B7 ${expense.type}'),
-                                        trailing: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              expense.type == 'Income'
-                                                  ? '+'
-                                                  : '-',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: expense.type == 'Income'
-                                                    ? Colors.green
-                                                    : Colors.red,
-                                              ),
-                                            ),
-                                            Text(
-                                              '\u20B1${expense.price.toStringAsFixed(2)}',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: expense.type == 'Income'
-                                                    ? Colors.green
-                                                    : Colors.red,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )),
-                                    );
-                                  }),
-                                ],
-                              );
-                            }).toList(),
-                          )
+                            children: buildExpenseList(context, expensesByDate, cardWidth),
+                          ),
+                        const SizedBox(height: 75),
                       ],
                     ),
                   ),

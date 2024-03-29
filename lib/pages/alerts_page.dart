@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'functions.dart';
+import '../functions.dart';
 
 class AlertsPage extends StatefulWidget {
   const AlertsPage({super.key});
 
   @override
-  _AlertsPageState createState() => _AlertsPageState();
+  AlertsPageState createState() => AlertsPageState();
 }
 
-class _AlertsPageState extends State<AlertsPage> {
+class AlertsPageState extends State<AlertsPage> {
   String loremIpsum =
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
   late Map<int, String> notifications;

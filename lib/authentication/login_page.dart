@@ -1,18 +1,20 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:bae/forgotpassword_page.dart';
-import 'package:bae/signup_page.dart';
+import '../authentication/forgotpassword_page.dart';
+import '../authentication/signup_page.dart';
 import 'package:flutter/material.dart';
-import 'main.dart';
-import 'functions.dart';
+import 'package:provider/provider.dart';
+import '../main.dart';
+import '../pages/pages.dart';
+import '../functions.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  LoginPageState createState() => LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _auth = FirebaseAuth.instance;
   String _email = '';
@@ -25,12 +27,17 @@ class _LoginPageState extends State<LoginPage> {
       try {
         await _auth.signInWithEmailAndPassword(
             email: _email, password: _password);
-        // Navigate to home page after successful login
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MyHomePage()),
-        );
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const MyHomePage()),
+          );
+
+          Provider.of<MyAppState>(context, listen: false).loadAppState();
+        }
       } on FirebaseAuthException catch (e) {
-        showSimpleDialog(context, 'Login Failed', e.message!);
+        if (mounted) {
+          showSimpleDialog(context, 'Login Failed', e.message!);
+        }
       }
     }
   }

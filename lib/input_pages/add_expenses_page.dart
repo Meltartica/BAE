@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'home_page.dart';
-import 'main.dart';
+import '../pages/home_page.dart';
+import '../main.dart';
 
 class AddExpensePage extends StatefulWidget {
   const AddExpensePage({super.key});
 
   @override
-  _AddExpensePageState createState() => _AddExpensePageState();
+  AddExpensePageState createState() => AddExpensePageState();
 }
 
-class _AddExpensePageState extends State<AddExpensePage> {
+class AddExpensePageState extends State<AddExpensePage> {
   String _type = 'Income';
 
   final TextEditingController _itemController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _categoryController = TextEditingController();
-  final TextEditingController _otherCategoryController =
-      TextEditingController();
   final TextEditingController _dateController = TextEditingController();
-  bool _isOtherCategorySelected = false;
   final _formKey = GlobalKey<FormState>();
   String? _selectedCategory;
   DateTime _selectedDate = DateTime.now();
@@ -33,6 +30,8 @@ class _AddExpensePageState extends State<AddExpensePage> {
   }
 
   final List<String> _categories = [
+    'Allowance',
+    'Salary',
     'Food',
     'Transportation',
     'Miscellaneous',
@@ -60,15 +59,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                 onTap: () {
                   onItemSelected(_categories[index]);
                   _selectedCategory = _categories[index];
-                  if (_selectedCategory == 'Others') {
-                    setState(() {
-                      _isOtherCategorySelected = true;
-                    });
-                  } else {
-                    setState(() {
-                      _isOtherCategorySelected = false;
-                    });
-                  }
                   Navigator.of(context).pop();
                 },
               );
@@ -220,25 +210,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   },
                 ),
               ),
-              if (_isOtherCategorySelected)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextFormField(
-                    controller: _otherCategoryController,
-                    decoration: InputDecoration(
-                      labelText: 'Others Category',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a category';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Center(
@@ -325,9 +296,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                 const SnackBar(content: Text('Please select a category')),
               );
               return;
-            }
-            if (_selectedCategory == 'Others') {
-              _selectedCategory = _otherCategoryController.text;
             }
             final expense = Expense(
               item: _itemController.text,
