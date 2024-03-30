@@ -221,13 +221,19 @@ class AddExpensePageState extends State<AddExpensePage> {
                         child: Card(
                           color: Theme.of(context).colorScheme.primaryContainer,
                           child: ListTile(
-                            leading: const Icon(
-                              Icons.calendar_today,
-                              size: 18,
-                            ),
-                            title: Text(
-                              DateFormat('MM/dd/yyyy').format(_selectedDate),
-                              style: const TextStyle(fontSize: 16),
+                            title: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.calendar_today,
+                                  size: 18,
+                                ),
+                                const SizedBox(height: 8.0),
+                                Text(
+                                  DateFormat('MM/dd/yyyy').format(_selectedDate),
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ],
                             ),
                             onTap: () async {
                               final date = await showDatePicker(
@@ -251,13 +257,19 @@ class AddExpensePageState extends State<AddExpensePage> {
                         child: Card(
                           color: Theme.of(context).colorScheme.primaryContainer,
                           child: ListTile(
-                            leading: const Icon(
-                              Icons.access_time,
-                              size: 18,
-                            ),
-                            title: Text(
-                              DateFormat('hh:mm a').format(_selectedTime),
-                              style: const TextStyle(fontSize: 16),
+                            title: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.access_time,
+                                  size: 18,
+                                ),
+                                const SizedBox(height: 8.0),
+                                Text(
+                                  DateFormat('hh:mm a').format(_selectedTime),
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ],
                             ),
                             onTap: () async {
                               final time = await showTimePicker(

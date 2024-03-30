@@ -86,9 +86,22 @@ class EditExpensePageState extends State<EditExpensePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('Edit Transaction'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(70),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          title: const Padding(
+            padding: EdgeInsets.only(top: 15.0),
+            child: Text(
+              'Benefits',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 30,
+              ),
+            ),
+          ),
+          toolbarHeight: 100,
+        ),
       ),
       body: Form(
         key: _formKey,
@@ -230,13 +243,19 @@ class EditExpensePageState extends State<EditExpensePage> {
                         child: Card(
                           color: Theme.of(context).colorScheme.primaryContainer,
                           child: ListTile(
-                            leading: const Icon(
-                              Icons.calendar_today,
-                              size: 18,
-                            ),
-                            title: Text(
-                              DateFormat('MM/dd/yyyy').format(_selectedDate),
-                              style: const TextStyle(fontSize: 16),
+                            title: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.calendar_today,
+                                  size: 18,
+                                ),
+                                const SizedBox(height: 8.0),
+                                Text(
+                                  DateFormat('MM/dd/yyyy').format(_selectedDate),
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ],
                             ),
                             onTap: () async {
                               final date = await showDatePicker(
@@ -260,13 +279,19 @@ class EditExpensePageState extends State<EditExpensePage> {
                         child: Card(
                           color: Theme.of(context).colorScheme.primaryContainer,
                           child: ListTile(
-                            leading: const Icon(
-                              Icons.access_time,
-                              size: 18,
-                            ),
-                            title: Text(
-                              DateFormat('hh:mm a').format(_selectedTime),
-                              style: const TextStyle(fontSize: 16),
+                            title: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.access_time,
+                                  size: 18,
+                                ),
+                                const SizedBox(height: 8.0),
+                                Text(
+                                  DateFormat('hh:mm a').format(_selectedTime),
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ],
                             ),
                             onTap: () async {
                               final time = await showTimePicker(
@@ -297,28 +322,41 @@ class EditExpensePageState extends State<EditExpensePage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            if (_selectedCategory == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Please select a category')),
-              );
-              return;
-            }
-            final expense = Expense(
-              item: _itemController.text,
-              price: double.parse(_priceController.text),
-              category: _selectedCategory!,
-              date: _selectedDate,
-              type: _type,
-            );
-            Provider.of<MyAppState>(context, listen: false).addExpense(expense);
-            Navigator.of(context).pop();
-          }
-        },
-        label: const Text('Save'),
-        icon: const Icon(Icons.save),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton.extended(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            label: const Text('Delete'),
+            icon: const Icon(Icons.delete),
+          ),
+          const SizedBox(width: 10),
+          FloatingActionButton.extended(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                if (_selectedCategory == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please select a category')),
+                  );
+                  return;
+                }
+                final expense = Expense(
+                  item: _itemController.text,
+                  price: double.parse(_priceController.text),
+                  category: _selectedCategory!,
+                  date: _selectedDate,
+                  type: _type,
+                );
+                Provider.of<MyAppState>(context, listen: false).editExpense(expense);
+                Navigator.of(context).pop();
+              }
+            },
+            label: const Text('Save'),
+            icon: const Icon(Icons.save),
+          ),
+        ],
       ),
     );
   }

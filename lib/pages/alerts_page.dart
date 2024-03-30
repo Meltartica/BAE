@@ -1,5 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../functions.dart';
+import '../main.dart';
+
+class Notification {
+  final String title;
+  final String body;
+  final bool isUrgent;
+
+  Notification({required this.title, required this.body, this.isUrgent = false}); // Modify this line
+
+  Map<String, dynamic> toJson() => {
+    'title': title,
+    'body': body,
+    'isUrgent': isUrgent,
+  };
+
+  factory Notification.fromJson(Map<String, dynamic> json) {
+    return Notification(
+      title: json['title'],
+      body: json['body'],
+      isUrgent: json['isUrgent'],
+    );
+  }
+}
 
 class AlertsPage extends StatefulWidget {
   const AlertsPage({super.key});
@@ -9,24 +33,20 @@ class AlertsPage extends StatefulWidget {
 }
 
 class AlertsPageState extends State<AlertsPage> {
-  String loremIpsum =
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
-  late Map<int, String> notifications;
+  late MyAppState appState;
 
   @override
   void initState() {
-    super.initState();
-    notifications = Map.fromIterable(
-      List.generate(10, (index) => index),
-      value: (index) => loremIpsum.split(" ").take(50).join(" "),
-    );
+  super.initState();
+  appState = Provider.of<MyAppState>(context, listen: false);
   }
 
   void dismissNotification(int key) {
-    String dismissedNotification = notifications[key]!;
+    Notification dismissedNotification = appState.notifications[key]!;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
-        notifications.remove(key);
+        appState.notifications.remove(key);
+        appState.saveAppState();
       });
     });
     ScaffoldMessenger.of(context).showSnackBar(
@@ -38,7 +58,8 @@ class AlertsPageState extends State<AlertsPage> {
           label: 'Undo',
           onPressed: () {
             setState(() {
-              notifications[key] = dismissedNotification;
+              appState.notifications[key] = dismissedNotification;
+              appState.saveAppState();
             });
           },
           textColor: Theme.of(context).colorScheme.primary,
@@ -56,61 +77,105 @@ class AlertsPageState extends State<AlertsPage> {
       ),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          return Padding(
-            padding: EdgeInsets.only(top: constraints.maxHeight * 0.01),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: SizedBox(
-                width: constraints.maxWidth * 0.975,
-                child: ListView.builder(
-                  itemCount: notifications.length,
-                  itemBuilder: (context, index) {
-                    int key = notifications.keys.elementAt(index);
-                    return Dismissible(
-                      key: Key(key.toString()),
-                      onDismissed: (direction) {
-                        dismissNotification(key);
-                      },
-                      child: Card(
-                        child: ListTile(
-                          title: Text('Notification ${index + 1}'),
-                          subtitle: Text(
-                            notifications[key]!,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.justify,
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () {
-                              dismissNotification(key);
-                            },
-                          ),
-                          onTap: () {
-                            if (MediaQuery.of(context).size.width > 600) {
-                              showCustomDialog(context, index, notifications);
-                            } else {
-                              showCustomBottomSheet(
-                                  context, index, notifications);
-                            }
-                          },
-                        ),
-                      ),
-                    );
-                  },
+          if (appState.notifications.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.notifications_none_rounded,
+                          size: 80,
+                          color: Theme.of(context).colorScheme.primary),
+                      const Text('No notifications yet?',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                      const Text('You will see your notifications here when they arrive.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 14)),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
+            );
+          } else {
+            return Padding(
+              padding: EdgeInsets.only(top: constraints.maxHeight * 0.01),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: SizedBox(
+                  width: constraints.maxWidth * 0.975,
+                  child: ListView.builder(
+                    itemCount: appState.notifications.length,
+                    itemBuilder: (context, index) {
+                      int key = appState.notifications.keys.toList().reversed.elementAt(index);
+                      return Dismissible(
+                        key: Key(key.toString()),
+                        onDismissed: (direction) {
+                          dismissNotification(key);
+                        },
+                        child: Card(
+                          child: ListTile(
+                            title: Text(
+                              appState.notifications[key]!.title,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: appState.notifications[key]!.isUrgent ? Colors.red : Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                            subtitle: Text(
+                              appState.notifications[key]!.body,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.justify,
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: () {
+                                dismissNotification(key);
+                              },
+                            ),
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text(
+                                        appState.notifications[key]!.title,
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                    content: Text(appState.notifications[key]!.body),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: const Text('Close'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            );
+          }
         },
       ),
-      floatingActionButton: notifications.isEmpty
+      floatingActionButton: appState.notifications.isEmpty
           ? null
           : FloatingActionButton.extended(
               heroTag: 'clearAll',
               onPressed: () {
-                Map<int, String> tempNotifications = Map.from(notifications);
+                Map<int, String> tempNotifications = Map.from(appState.notifications);
                 setState(() {
-                  notifications.clear();
+                  appState.notifications.clear();
                 });
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -119,7 +184,7 @@ class AlertsPageState extends State<AlertsPage> {
                       label: 'Undo',
                       onPressed: () {
                         setState(() {
-                          notifications = Map.from(tempNotifications);
+                          appState.notifications = Map.from(tempNotifications);
                         });
                       },
                     ),

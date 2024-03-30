@@ -1,9 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import '../lists/expenses_list.dart';
 import 'package:intl/intl.dart';
 import '../input_pages/add_expenses_page.dart';
+import 'search_page.dart';
 import '../functions.dart';
 import '../main.dart';
 
@@ -31,12 +33,12 @@ class Expense {
       };
 
   factory Expense.fromJson(Map<String, dynamic> json) => Expense(
-        item: json['item'],
-        price: json['price'],
-        category: json['category'],
-        date: DateTime.parse(json['date']),
-        type: json['type'],
-      );
+    item: json['item'],
+    price: (json['price'] is int) ? (json['price'] as int).toDouble() : json['price'],
+    category: json['category'],
+    date: DateTime.parse(json['date']),
+    type: json['type'],
+  );
 }
 
 class HomePage extends StatefulWidget {
@@ -49,6 +51,38 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   String? selectedCategory;
   String selectedButton = 'All';
+
+  final ScrollController _scrollController = ScrollController();
+  bool _showFab = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+        if (_showFab == true) {
+          setState(() {
+            _showFab = false;
+          });
+        }
+      }
+
+      if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
+        if (_showFab == false) {
+          setState(() {
+            _showFab = true;
+          });
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,9 +145,52 @@ class HomePageState extends State<HomePage> {
         return Scaffold(
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(70),
-            child: AppBarBuilder.buildAppBar('Home'),
+            child: AppBar(
+              title: const Padding(
+                padding: EdgeInsets.only(top: 15.0),
+                child: Text(
+                  'Benefits',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30,
+                  ),
+                ),
+              ),
+              actions: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(top: 12.0, right: 15),
+                  child: SizedBox(
+                    width: 130,
+                    height: 40,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.search),
+                      label: const Text('Search'),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => SearchPage(expenses: appState.expenses),
+                          ),
+                        );
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                          Theme.of(context).colorScheme.primaryContainer,
+                        ),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+              toolbarHeight: 100,
+            ),
           ),
           body: SingleChildScrollView(
+            controller: _scrollController,
             child: LayoutBuilder(
                 builder: (BuildContext context, BoxConstraints constraints) {
               double cardWidth = constraints.maxWidth * 0.975;
@@ -399,7 +476,6 @@ class HomePageState extends State<HomePage> {
                           Column(
                             children: buildExpenseList(context, expensesByDate, cardWidth),
                           ),
-                        const SizedBox(height: 75),
                       ],
                     ),
                   ),
@@ -407,7 +483,8 @@ class HomePageState extends State<HomePage> {
               );
             }),
           ),
-          floatingActionButton: FloatingActionButton.extended(
+          floatingActionButton: _showFab
+          ? FloatingActionButton.extended(
             heroTag: 'addExpense',
             onPressed: () async {
               final newExpense = await Navigator.of(context).push(
@@ -419,7 +496,7 @@ class HomePageState extends State<HomePage> {
             },
             label: const Text('Add'),
             icon: const Icon(Icons.add),
-          ),
+          ): null,
         );
       },
     );

@@ -32,7 +32,9 @@ class LoginPageState extends State<LoginPage> {
             MaterialPageRoute(builder: (context) => const MyHomePage()),
           );
 
-          Provider.of<MyAppState>(context, listen: false).loadAppState();
+          var appState = Provider.of<MyAppState>(context, listen: false);
+          appState.loadAppState();
+          appState.checkCategoryLimits();
         }
       } on FirebaseAuthException catch (e) {
         if (mounted) {

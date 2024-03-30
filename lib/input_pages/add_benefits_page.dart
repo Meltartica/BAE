@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
@@ -70,19 +70,19 @@ class AddBenefitsPageState extends State<AddBenefitsPage> {
   }
 
   Future<void> pickImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['jpg', 'jpeg', 'png'],
-    );
+    if (kIsWeb) {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png'],
+      );
 
-    if (result != null) {
-      PlatformFile file = result.files.first;
+      if (result != null) {
+        PlatformFile file = result.files.first;
 
-      setState(() {
-        imageBytes = file.bytes;
-      });
-    } else {
-      // User canceled the picker
+        setState(() {
+          imageBytes = file.bytes;
+        });
+      }
     }
   }
 
@@ -97,6 +97,7 @@ class AddBenefitsPageState extends State<AddBenefitsPage> {
     _titleController.dispose();
     _descriptionController.dispose();
     _amountController.dispose();
+    imageBytes = null;
     _categoryController.dispose();
     _transactionNumberController.dispose();
     _companyNameController.dispose();
@@ -352,15 +353,20 @@ class AddBenefitsPageState extends State<AddBenefitsPage> {
                                     .colorScheme
                                     .primaryContainer,
                                 child: ListTile(
-                                  leading: const Icon(
-                                    Icons.calendar_today,
-                                    size: 18,
-                                  ),
-                                  title: Text(
-                                    DateFormat('MM/dd/yyyy')
-                                        .format(_selectedDate),
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
+                                    title: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.calendar_today,
+                                          size: 18,
+                                        ),
+                                        const SizedBox(height: 8.0),
+                                        Text(
+                                          DateFormat('MM/dd/yyyy').format(_selectedDate),
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
                                   onTap: () async {
                                     final date = await showDatePicker(
                                       context: context,
@@ -388,13 +394,19 @@ class AddBenefitsPageState extends State<AddBenefitsPage> {
                                     .colorScheme
                                     .primaryContainer,
                                 child: ListTile(
-                                  leading: const Icon(
-                                    Icons.access_time,
-                                    size: 18,
-                                  ),
-                                  title: Text(
-                                    DateFormat('hh:mm a').format(_selectedTime),
-                                    style: const TextStyle(fontSize: 16),
+                                  title: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.access_time,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(height: 8.0),
+                                      Text(
+                                        DateFormat('hh:mm a').format(_selectedTime),
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
+                                    ],
                                   ),
                                   onTap: () async {
                                     final time = await showTimePicker(

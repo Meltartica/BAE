@@ -4,8 +4,8 @@ import '../pages/benefits_page.dart';
 
 Map<String, double> calculateCategoryExpenses(List<Benefit> benefits) {
   final pastWeeksBenefits = benefits.where((benefit) {
-    final weeksAgo = DateTime.now().subtract(const Duration(days: 7 * 2));
-    return benefit.selectedTime.isAfter(weeksAgo);
+    final oneYearAgo = DateTime.now().subtract(const Duration(days: 365));
+    return benefit.selectedTime.isAfter(oneYearAgo);
   }).toList();
 
   final Map<String, double> categoryBenefits = {};

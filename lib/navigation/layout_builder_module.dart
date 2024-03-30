@@ -45,7 +45,7 @@ class ResponsiveLayout extends StatelessWidget {
               onDestinationSelected: (index) {
                 _pageController.jumpToPage(index);
               },
-              destinations: NavigationDestinations.getMobileDestinations(),
+              destinations: NavigationDestinations.getMobileDestinations(context),
             ),
           );
         } else {
@@ -56,7 +56,7 @@ class ResponsiveLayout extends StatelessWidget {
                   minWidth: 80,
                   groupAlignment: 0,
                   labelType: NavigationRailLabelType.all,
-                  destinations: NavigationDestinations.getDestinations(),
+                  destinations: NavigationDestinations.getDestinations(context),
                   selectedIndex: pageIndex,
                   onDestinationSelected: (index) {
                     _pageController.jumpToPage(index);

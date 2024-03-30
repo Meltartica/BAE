@@ -88,7 +88,7 @@ List<Widget> buildExpenseList(BuildContext context, List<MapEntry<String, List<E
                       onPressed: () async {
                         Provider.of<MyAppState>(context,
                             listen: false)
-                            .removeExpense(expense);
+                            .deleteExpense(expense);
                         var newExpense = await Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => EditExpensePage(expense: expense),
@@ -103,49 +103,6 @@ List<Widget> buildExpenseList(BuildContext context, List<MapEntry<String, List<E
                         padding: const EdgeInsets.all(12),
                       ),
                       child: const Icon(Icons.edit),
-                    ),
-                    const SizedBox(width: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Confirmation'),
-                              content: const Text(
-                                  'Are you sure you want to delete this expense?'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('Cancel'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                TextButton(
-                                  child: const Text('Delete'),
-                                  onPressed: () {
-                                    Provider.of<MyAppState>(context,
-                                            listen: false)
-                                        .removeExpense(expense);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              'Expense deleted successfully')),
-                                    );
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                        padding: const EdgeInsets.all(12),
-                      ),
-                      child: const Icon(Icons.delete),
                     ),
                   ],
                 ),

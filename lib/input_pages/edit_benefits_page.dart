@@ -124,9 +124,22 @@ class EditBenefitsPageState extends State<EditBenefitsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('Edit Benefits'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(70),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          title: const Padding(
+            padding: EdgeInsets.only(top: 15.0),
+            child: Text(
+              'Benefits',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 30,
+              ),
+            ),
+          ),
+          toolbarHeight: 100,
+        ),
       ),
       body: Form(
         key: _formKey,
@@ -467,7 +480,7 @@ class EditBenefitsPageState extends State<EditBenefitsPage> {
               selectedDate: _selectedDate,
               selectedTime: _selectedTime,
             );
-            Provider.of<MyAppState>(context, listen: false).addBenefit(benefit);
+            Provider.of<MyAppState>(context, listen: false).editBenefit(benefit);
             Navigator.of(context).pop();
           }
         },
