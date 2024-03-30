@@ -5,10 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'authentication/firebase_options.dart';
 import 'package:flutter_file_saver/flutter_file_saver.dart';
-import 'package:flutter/services.dart';
 import '../pages/alerts_page.dart' as alerts;
 import '../pages/pages.dart';
 import '../pages/home_page.dart';
@@ -125,6 +125,11 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void revertLoading() {
+    isInBenefitsPage = false;
+    loadAppState();
+  }
+
   MyAppState() {
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (_auth.currentUser != null && !isInBenefitsPage) {
@@ -133,9 +138,8 @@ class MyAppState extends ChangeNotifier {
     });
   }
 
-  void logOut() {
-    _auth.signOut();
-    resetUserData();
+  Future<void> logOut() async {
+    await _auth.signOut();
     notifyListeners();
   }
 
@@ -215,7 +219,7 @@ class MyAppState extends ChangeNotifier {
       if (kDebugMode) {
         print('Error loading app state: $e');
         print('Stack trace: $s');
-        // Clipboard.setData(ClipboardData(text: 'Error loading app state: $e\nStack trace: $s'));
+        Clipboard.setData(ClipboardData(text: 'Error saving app state: $e\nStack trace: $s'));
       }
     }
   }
@@ -239,15 +243,15 @@ class MyAppState extends ChangeNotifier {
           .toList();
       notifications = (jsonDecode(data['notifications'] ?? '{}') as Map).map((key, value) => MapEntry(int.parse(key), alerts.Notification.fromJson(value)));
       notifyListeners();
-      if (kDebugMode) {
+      /* if (kDebugMode) {
         print ('Loaded app state');
-      }
+      } */
     } catch (e, s) {
-      if (kDebugMode) {
+      /* if (kDebugMode) {
         print('Error loading app state: $e');
         print('Stack trace: $s');
-        // Clipboard.setData(ClipboardData(text: 'Error loading app state: $e\nStack trace: $s'));
-      }
+        Clipboard.setData(ClipboardData(text: 'Error loading app state: $e\nStack trace: $s'));
+      } */
     }
   }
 

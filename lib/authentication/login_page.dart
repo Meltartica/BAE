@@ -19,6 +19,13 @@ class LoginPageState extends State<LoginPage> {
   final _auth = FirebaseAuth.instance;
   String _email = '';
   String _password = '';
+  bool _obscureText = true;
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
 
   void _tryLogin() async {
     final form = _formKey.currentState;
@@ -95,10 +102,21 @@ class LoginPageState extends State<LoginPage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
+                        suffixIcon: Padding (
+                        padding: const EdgeInsets.all(8.0),
+                        child: IconButton(
+                          icon: Icon(
+                            // Choose the icon based on password visibility
+                            _obscureText ? Icons.visibility_off : Icons.visibility,
+                          ),
+                          onPressed: _togglePasswordVisibility,
+                        ),
+                      ),
                       ),
                       validator: (value) =>
-                          value!.isEmpty ? 'Please enter your password' : null,
+                      value!.isEmpty ? 'Please enter your password' : null,
                       onSaved: (value) => _password = value!,
+                      obscureText: _obscureText,
                     ),
                   ),
                   Padding(

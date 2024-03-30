@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../pages/account_page.dart';
 import 'main.dart';
 
 // Edit Profile Dialog That is used in the Account Page
 class EditProfileDialog extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
+
 
   EditProfileDialog({super.key});
 
@@ -30,6 +32,7 @@ class EditProfileDialog extends StatelessWidget {
           onPressed: () {
             String newUsername = _usernameController.text;
             Provider.of<MyAppState>(context, listen: false).updateProfile(newUsername);
+            MyAppState().revertLoading();
             Navigator.of(context).pop();
           },
         ),

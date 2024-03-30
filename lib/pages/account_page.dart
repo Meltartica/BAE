@@ -5,8 +5,21 @@ import '../functions.dart';
 import '../main.dart';
 import '../authentication/login_page.dart';
 
-class AccountPage extends StatelessWidget {
+class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
+
+  @override
+  AccountPageState createState() => AccountPageState();
+}
+
+class AccountPageState extends State<AccountPage> {
+  late MyAppState _myAppState;
+
+  @override
+  void initState() {
+    super.initState();
+    _myAppState = Provider.of<MyAppState>(context, listen: false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +57,10 @@ class AccountPage extends StatelessWidget {
                             width: 50,
                             height: 50,
                             child: FloatingActionButton(
+                              heroTag: 'editProfile',
                               child: const Icon(Icons.edit),
                               onPressed: () {
+                                _myAppState.isInBenefitsPage = true;
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
@@ -97,6 +112,7 @@ class AccountPage extends StatelessWidget {
                             width: 50,
                             height: 50,
                             child: FloatingActionButton(
+                              heroTag: 'categoryLimit',
                               child: const Icon(Icons.edit_rounded),
                               onPressed: () {
                                 Navigator.of(context).push(
@@ -124,6 +140,7 @@ class AccountPage extends StatelessWidget {
                             width: 50,
                             height: 50,
                             child: FloatingActionButton(
+                              heroTag: 'importData',
                               child: const Icon(Icons.file_upload),
                               onPressed: () {
                                 Provider.of<MyAppState>(context, listen: false)
@@ -147,6 +164,7 @@ class AccountPage extends StatelessWidget {
                             width: 50,
                             height: 50,
                             child: FloatingActionButton(
+                              heroTag: 'exportData',
                               child: const Icon(Icons.file_download),
                               onPressed: () {
                                 Provider.of<MyAppState>(context, listen: false)
@@ -170,6 +188,7 @@ class AccountPage extends StatelessWidget {
                             width: 50,
                             height: 50,
                             child: FloatingActionButton(
+                              heroTag: 'resetData',
                               child: const Icon(Icons.refresh),
                               onPressed: () {
                                 showDialog(
@@ -217,6 +236,7 @@ class AccountPage extends StatelessWidget {
                             width: 50,
                             height: 50,
                             child: FloatingActionButton(
+                              heroTag: 'deleteAccount',
                               child: const Icon(Icons.delete_forever),
                               onPressed: () {
                                 showDialog(
@@ -250,13 +270,16 @@ class AccountPage extends StatelessWidget {
                                               context: context,
                                               builder: (BuildContext context) {
                                                 return AlertDialog(
-                                                  title: const Text('Account Delete Complete'),
-                                                  content: const Text('Your account has been successfully deleted.'),
+                                                  title: const Text(
+                                                      'Account Delete Complete'),
+                                                  content: const Text(
+                                                      'Your account has been successfully deleted.'),
                                                   actions: <Widget>[
                                                     TextButton(
                                                       child: const Text('OK'),
                                                       onPressed: () {
-                                                        Navigator.of(context).pop();
+                                                        Navigator.of(context)
+                                                            .pop();
                                                       },
                                                     ),
                                                   ],
@@ -288,6 +311,7 @@ class AccountPage extends StatelessWidget {
                             width: 50,
                             height: 50,
                             child: FloatingActionButton(
+                              heroTag: 'signOut',
                               child: const Icon(Icons.logout),
                               onPressed: () {
                                 showDialog(
@@ -320,13 +344,16 @@ class AccountPage extends StatelessWidget {
                                               context: context,
                                               builder: (BuildContext context) {
                                                 return AlertDialog(
-                                                  title: const Text('Log Out Complete'),
-                                                  content: const Text('You have been successfully logged out.'),
+                                                  title: const Text(
+                                                      'Log Out Complete'),
+                                                  content: const Text(
+                                                      'You have been successfully logged out.'),
                                                   actions: <Widget>[
                                                     TextButton(
                                                       child: const Text('OK'),
                                                       onPressed: () {
-                                                        Navigator.of(context).pop();
+                                                        Navigator.of(context)
+                                                            .pop();
                                                       },
                                                     ),
                                                   ],
