@@ -133,6 +133,12 @@ class MyAppState extends ChangeNotifier {
     });
   }
 
+  void logOut() {
+    _auth.signOut();
+    resetUserData();
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _timer?.cancel();

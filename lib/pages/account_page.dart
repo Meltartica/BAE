@@ -315,7 +315,7 @@ class AccountPage extends StatelessWidget {
                                                     const LoginPage(),
                                               ),
                                             );
-                                            MyAppState().resetUserData();
+                                            MyAppState().logOut();
                                             showDialog(
                                               context: context,
                                               builder: (BuildContext context) {
