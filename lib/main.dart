@@ -151,6 +151,32 @@ class MyAppState extends ChangeNotifier {
     saveAppState();
   }
 
+  Future<void> deleteAccount() async {
+    try {
+      // Get the current user
+      User? currentUser = _auth.currentUser;
+
+      // Check if the current user is not null
+      if (currentUser != null) {
+        // Delete the user
+        await currentUser.delete();
+
+        resetUserData();
+
+        // Notify listeners to update the UI
+        notifyListeners();
+
+        // Save the app state
+        saveAppState();
+      }
+    } catch (e) {
+      // Handle any errors that occur during the deletion process
+      if (kDebugMode) {
+        print('Failed to delete account: $e');
+      }
+    }
+  }
+
   void urgentNotificationsListener(Map<String, String> data) {
     int key = DateTime.now().millisecondsSinceEpoch;
 
@@ -183,7 +209,7 @@ class MyAppState extends ChangeNotifier {
       if (kDebugMode) {
         print('Error loading app state: $e');
         print('Stack trace: $s');
-        Clipboard.setData(ClipboardData(text: 'Error loading app state: $e\nStack trace: $s'));
+        // Clipboard.setData(ClipboardData(text: 'Error loading app state: $e\nStack trace: $s'));
       }
     }
   }
@@ -214,7 +240,7 @@ class MyAppState extends ChangeNotifier {
       if (kDebugMode) {
         print('Error loading app state: $e');
         print('Stack trace: $s');
-        Clipboard.setData(ClipboardData(text: 'Error loading app state: $e\nStack trace: $s'));
+        // Clipboard.setData(ClipboardData(text: 'Error loading app state: $e\nStack trace: $s'));
       }
     }
   }
