@@ -163,20 +163,13 @@ class MyAppState extends ChangeNotifier {
 
   Future<void> deleteAccount() async {
     try {
-      // Get the current user
       User? currentUser = _auth.currentUser;
 
       // Check if the current user is not null
       if (currentUser != null) {
-        // Delete the user
         await currentUser.delete();
-
         resetUserData();
-
-        // Notify listeners to update the UI
         notifyListeners();
-
-        // Save the app state
         saveAppState();
       }
     } catch (e) {
