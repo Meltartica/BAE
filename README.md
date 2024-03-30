@@ -34,12 +34,11 @@ BenefitsAtEase (BAE) is a software application designed to simplify the process 
 
 ## Libraries and Technologies Used
 
-- **Flutter Framework**: Open-source UI software development kit for building natively compiled applications across multiple platforms from a single codebase.
-- **MySQL Database**: Open-source relational database management system for data storage.
-- **Hibernate Query Language (HQL)**: Object-oriented database query language for creating, updating, and deleting data.
-- **Figma**: Collaborative web-based design and prototyping tool for UI/UX design.
-- **HTTPS, FTP, TCP/IP**: Communication protocols for secure data transfer and network communication.
-- **Authentication and Encryption Protocols**: Industry-standard protocols for secure user authentication and data encryption.
+- **Flutter Framework** 📱: Open-source UI software development kit for building natively compiled applications across multiple platforms from a single codebase.
+- **Firebase** 🔥: Google's mobile and web application development platform that provides authentication, real-time database, cloud storage, and more.
+- **Figma** 🎨: Collaborative web-based design and prototyping tool for UI/UX design.
+- **HTTPS, FTP, TCP/IP** 🌐: Communication protocols for secure data transfer and network communication.
+- **Authentication and Encryption Protocols** 🔒: Industry-standard protocols for secure user authentication and data encryption.
 
 ## Getting Started
 
