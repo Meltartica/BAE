@@ -296,8 +296,7 @@ class EditExpensePageState extends State<EditExpensePage> {
                             onTap: () async {
                               final time = await showTimePicker(
                                 context: context,
-                                initialTime:
-                                    TimeOfDay.fromDateTime(_selectedTime),
+                                initialTime: TimeOfDay.fromDateTime(_selectedTime),
                               );
                               if (time != null) {
                                 setState(() {
@@ -334,6 +333,7 @@ class EditExpensePageState extends State<EditExpensePage> {
           ),
           const SizedBox(width: 10),
           FloatingActionButton.extended(
+            heroTag: 'save',
             onPressed: () {
               if (_formKey.currentState!.validate()) {
                 if (_selectedCategory == null) {
@@ -346,7 +346,7 @@ class EditExpensePageState extends State<EditExpensePage> {
                   item: _itemController.text,
                   price: double.parse(_priceController.text),
                   category: _selectedCategory!,
-                  date: _selectedDate,
+                  date: _selectedTime,
                   type: _type,
                 );
                 Provider.of<MyAppState>(context, listen: false).editExpense(expense);

@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'authentication/firebase_options.dart';
 import 'package:flutter_file_saver/flutter_file_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../pages/alerts_page.dart' as alerts;
 import '../pages/pages.dart';
 import '../pages/home_page.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) {
         MyAppState appState = MyAppState();
+        // requestPermissions();
         appState.loadAppState();
         return appState;
       },
@@ -480,3 +482,25 @@ class MyAppState extends ChangeNotifier {
     }
   }
 }
+
+/* Future<void> requestPermissions() async {
+  // Define a list with the permissions you want to request
+  List<Permission> permissions = [
+    Permission.photos,
+    Permission.mediaLibrary,
+    Permission.storage,
+    Permission.photosAddOnly,
+    Permission.manageExternalStorage,
+  ];
+
+  // Request permissions
+  Map<Permission, PermissionStatus> statuses = await permissions.request();
+
+  // Check permission status
+  statuses.forEach((permission, status) {
+    if (!status.isGranted) {
+      // Handle when a permission is not granted
+      print('$permission is not granted');
+    }
+  });
+} */

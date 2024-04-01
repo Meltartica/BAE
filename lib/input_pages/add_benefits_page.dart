@@ -83,6 +83,24 @@ class AddBenefitsPageState extends State<AddBenefitsPage> {
           imageBytes = file.bytes;
         });
       }
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Unsupported Feature'),
+            content: const Text('This feature is only Supported in the Web Version.'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
