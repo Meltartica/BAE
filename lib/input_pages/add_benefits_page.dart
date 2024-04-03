@@ -70,7 +70,7 @@ class AddBenefitsPageState extends State<AddBenefitsPage> {
   }
 
   Future<void> pickImage() async {
-    if (kIsWeb) {
+    //if (kIsWeb) {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['jpg', 'jpeg', 'png'],
@@ -83,7 +83,7 @@ class AddBenefitsPageState extends State<AddBenefitsPage> {
           imageBytes = file.bytes;
         });
       }
-    } else {
+    /*} else {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -101,7 +101,7 @@ class AddBenefitsPageState extends State<AddBenefitsPage> {
           );
         },
       );
-    }
+    } */
   }
 
   void removeImage() {
