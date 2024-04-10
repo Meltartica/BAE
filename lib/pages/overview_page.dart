@@ -152,7 +152,7 @@ class OverviewPage extends StatelessWidget {
                                             ),
                                           ),
                                           Text(
-                                            'Over Past 7 Days',
+                                            'Over Past Year',
                                             style: TextStyle(
                                               fontSize: 16,
                                               color: Theme

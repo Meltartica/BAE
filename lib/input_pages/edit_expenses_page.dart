@@ -25,9 +25,7 @@ class EditExpensePageState extends State<EditExpensePage> {
   DateTime _selectedDate = DateTime.now();
   DateTime _selectedTime = DateTime.now();
 
-  final List<String> _categories = [
-    'Allowance',
-    'Salary',
+  final List<String> _expense = [
     'Food',
     'Transportation',
     'Miscellaneous',
@@ -41,18 +39,24 @@ class EditExpensePageState extends State<EditExpensePage> {
     'Others'
   ];
 
+  final List<String> _income = [
+    'Allowance',
+    'Salary',
+    'Others',
+  ];
+
   void showBottomSheet(BuildContext context, Function(String) onItemSelected) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
           return ListView.builder(
-            itemCount: _categories.length,
+            itemCount: _type == 'Income' ? _income.length : _expense.length,
             itemBuilder: (BuildContext context, int index) {
               return ListTile(
-                title: Text(_categories[index]),
+                title: Text(_type == 'Income' ? _income[index] : _expense[index]),
                 onTap: () {
-                  onItemSelected(_categories[index]);
-                  _selectedCategory = _categories[index];
+                  onItemSelected(_type == 'Income' ? _income[index] : _expense[index]);
+                  _selectedCategory = _type == 'Income' ? _income[index] : _expense[index];
                   Navigator.of(context).pop();
                 },
               );

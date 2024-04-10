@@ -339,7 +339,7 @@ class AccountPageState extends State<AccountPage> {
                                                     const LoginPage(),
                                               ),
                                             );
-                                            MyAppState().logOut();
+                                            Provider.of<MyAppState>(context, listen: false).logOut();
                                             showDialog(
                                               context: context,
                                               builder: (BuildContext context) {

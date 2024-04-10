@@ -119,8 +119,12 @@ class MyAppState extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   String selectedButton = 'All';
+  String selectedBenefit = 'All';
 
   bool isInBenefitsPage = false;
+
+  DateTimeRange? selectedDateRange;
+  DateTimeRange? selectedBenefitDateRange;
 
   void updateSelectedButton(String newButton) {
     selectedButton = newButton;
@@ -132,6 +136,27 @@ class MyAppState extends ChangeNotifier {
     loadAppState();
   }
 
+  void updateSelectedBenefit(String newButton) {
+    selectedBenefit = newButton;
+    notifyListeners();
+  }
+
+  void updateBenefitDateRange(DateTimeRange newDateRange) {
+    selectedBenefitDateRange = DateTimeRange(
+      start: DateTime(newDateRange.start.year, newDateRange.start.month, newDateRange.start.day, 0, 0),
+      end: DateTime(newDateRange.end.year, newDateRange.end.month, newDateRange.end.day, 23, 59),
+    );
+    notifyListeners();
+  }
+
+  void updateDateRange(DateTimeRange newDateRange) {
+    selectedDateRange = DateTimeRange(
+      start: DateTime(newDateRange.start.year, newDateRange.start.month, newDateRange.start.day, 0, 0),
+      end: DateTime(newDateRange.end.year, newDateRange.end.month, newDateRange.end.day, 23, 59),
+    );
+    notifyListeners();
+  }
+
   MyAppState() {
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (_auth.currentUser != null && !isInBenefitsPage) {
@@ -141,7 +166,19 @@ class MyAppState extends ChangeNotifier {
   }
 
   Future<void> logOut() async {
+    clearAppState();
     await _auth.signOut();
+    notifyListeners();
+  }
+
+  void clearAppState() {
+    _benefits.clear();
+    expenses.clear();
+    _username = 'Anonymous';
+    categoryLimits = defaultLimits;
+    savings = 0.0;
+    _themeModeNotifier.value = ThemeMode.dark;
+    notifications.clear();
     notifyListeners();
   }
 

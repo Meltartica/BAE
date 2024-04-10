@@ -4,7 +4,7 @@ import '../pages/home_page.dart';
 
 Map<String, dynamic> calculateCategoryExpenses(List<Expense> expenses) {
   final pastWeeksExpenses = expenses.where((expense) {
-    final weeksAgo = DateTime.now().subtract(const Duration(days: 7 * 2));
+    final weeksAgo = DateTime.now().subtract(const Duration(days: 365));
     return expense.date.isAfter(weeksAgo) && expense.type != 'Income';
   }).toList();
 
@@ -24,12 +24,11 @@ Map<String, dynamic> calculateCategoryExpenses(List<Expense> expenses) {
 
 Map<String, Color> calculateCategoryColors(List<Expense> expenses) {
   Map<String, Color> categoryColors = {};
-  List<Color> availableColors = [Colors.red, Colors.green, Colors.blue, Colors.yellow]; // Add more colors as needed
 
   int colorIndex = 0;
   for (var expense in expenses) {
     if (!categoryColors.containsKey(expense.category)) {
-      categoryColors[expense.category] = availableColors[colorIndex % availableColors.length];
+      categoryColors[expense.category] = pieColors[colorIndex % pieColors.length];
       colorIndex++;
     }
   }

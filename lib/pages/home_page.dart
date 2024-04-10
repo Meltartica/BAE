@@ -6,7 +6,6 @@ import '../lists/expenses_list.dart';
 import 'package:intl/intl.dart';
 import '../input_pages/add_expenses_page.dart';
 import 'search_page.dart';
-import '../functions.dart';
 import '../main.dart';
 
 class Expense {
@@ -50,6 +49,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   String? selectedCategory;
+  String? selectedExpenseType;
   String selectedButton = 'All';
 
   final ScrollController _scrollController = ScrollController();
@@ -86,6 +86,10 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final categories = appState.expenses.map((e) => e.category).toSet().toList();
+    final expenseTypes = appState.expenses.map((e) => e.type).toSet().toList();
+    final List<String> dateFilters = ['All', 'Daily', 'Weekly', 'Monthly', 'Yearly', 'Select Date Range'];
+
     return Consumer<MyAppState>(
       builder: (context, appState, child) {
         double totalSpent = appState.expenses
@@ -101,8 +105,18 @@ class HomePageState extends State<HomePage> {
         });
 
         final filteredExpenses =
-            Map.fromEntries(groupedExpenses.entries.where((entry) {
+        Map.fromEntries(groupedExpenses.entries.where((entry) {
           var entryDate = DateFormat('MMMM dd, yyyy').parse(entry.key);
+          var expenses = entry.value;
+          if (selectedCategory != null) {
+            expenses = expenses.where((expense) => expense.category == selectedCategory).toList();
+          }
+          if (selectedExpenseType != null) {
+            expenses = expenses.where((expense) => expense.type == selectedExpenseType).toList();
+          }
+          if (expenses.isEmpty) {
+            return false;
+          }
           if (appState.selectedButton == 'All') {
             return true;
           } else if (appState.selectedButton == 'Daily') {
@@ -117,6 +131,9 @@ class HomePageState extends State<HomePage> {
                 entryDate.year == DateTime.now().year;
           } else if (appState.selectedButton == 'Yearly') {
             return entryDate.year == DateTime.now().year;
+          } else if (appState.selectedButton == 'Select Date Range' && appState.selectedDateRange != null) {
+            return entryDate.isAfter(appState.selectedDateRange!.start) &&
+                entryDate.isBefore(appState.selectedDateRange!.end);
           } else {
             return false;
           }
@@ -434,18 +451,138 @@ class HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
+                        Padding (
+                          padding: const EdgeInsets.only(top: 8.0, left: 16, right: 16),
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                createSortButton(context, 'All', 'All'),
-                                createSortButton(context, 'Daily', 'Daily'),
-                                createSortButton(context, 'Weekly', 'Weekly'),
-                                createSortButton(context, 'Monthly', 'Monthly'),
-                                createSortButton(context, 'Yearly', 'Yearly'),
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: const Size(50, 50),
+                                    backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                                  ),
+                                  child: Text(appState.selectedButton),
+                                  onPressed: () {
+                                    showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return SimpleDialog(
+                                          title: const Text('Select Date Filter'),
+                                          children: dateFilters.map((String value) {
+                                            return SimpleDialogOption(
+                                              child: Text(value),
+                                              onPressed: () {
+                                                if (value == 'Select Date Range') {
+                                                  showDateRangePicker(
+                                                    context: context,
+                                                    firstDate: DateTime(DateTime.now().year - 1),
+                                                    lastDate: DateTime(DateTime.now().year + 1),
+                                                    initialDateRange: appState.selectedDateRange,
+                                                  ).then((dateRange) {
+                                                    if (dateRange == null) {
+                                                      return;
+                                                    }
+                                                    setState(() {
+                                                      DateTime startDate = DateTime(dateRange.start.year, dateRange.start.month, dateRange.start.day - 1, 23, 59, 59);
+                                                      DateTime endDate = DateTime(dateRange.end.year, dateRange.end.month, dateRange.end.day, 23, 59, 59);
+                                                      appState.selectedButton = value;
+                                                      appState.selectedDateRange = DateTimeRange(start: startDate, end: endDate);
+                                                      Navigator.pop(context);
+                                                    });
+                                                  });
+                                                } else {
+                                                  setState(() {
+                                                    appState.selectedButton =
+                                                        value;
+                                                  });
+                                                  Navigator.pop(context);
+                                                }
+                                              },
+                                            );
+                                          }).toList(),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: const Size(50, 50),
+                                    backgroundColor:
+                                    Theme.of(context).colorScheme.primaryContainer,
+                                  ),
+                                  child: Text(selectedCategory ?? 'Select Category'),
+                                  onPressed: () {
+                                    showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return SimpleDialog(
+                                          title: const Text('Select Category'),
+                                          children: categories.map((String value) {
+                                            return SimpleDialogOption(
+                                              child: Text(value),
+                                              onPressed: () {
+                                                setState(() {
+                                                  selectedCategory = value;
+                                                });
+                                                Navigator.pop(context);
+                                              },
+                                            );
+                                          }).toList(),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: const Size(50, 50),
+                                    backgroundColor:
+                                    Theme.of(context).colorScheme.primaryContainer,
+                                  ),
+                                  child: Text(
+                                      selectedExpenseType ?? 'Select Expense Type'),
+                                  onPressed: () {
+                                    showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return SimpleDialog(
+                                          title: const Text('Select Expense Type'),
+                                          children: expenseTypes.map((String value) {
+                                            return SimpleDialogOption(
+                                              child: Text(value),
+                                              onPressed: () {
+                                                setState(() {
+                                                  selectedExpenseType = value;
+                                                });
+                                                Navigator.pop(context);
+                                              },
+                                            );
+                                          }).toList(),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: const Size(50, 50),
+                                    backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                                  ),
+                                  child: const Text('Clear Filters'),
+                                  onPressed: () {
+                                    setState(() {
+                                      appState.selectedButton = 'All';
+                                      selectedCategory = null;
+                                      selectedExpenseType = null;
+                                    });
+                                  },
+                                ),
                               ],
                             ),
                           ),
