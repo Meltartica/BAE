@@ -86,9 +86,6 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final categories = appState.expenses.map((e) => e.category).toSet().toList();
-    final expenseTypes = appState.expenses.map((e) => e.type).toSet().toList();
-    final List<String> dateFilters = ['All', 'Daily', 'Weekly', 'Monthly', 'Yearly', 'Select Date Range'];
 
     return Consumer<MyAppState>(
       builder: (context, appState, child) {
@@ -100,23 +97,32 @@ class HomePageState extends State<HomePage> {
             .fold(0, (prev, element) => prev + element.price);
         double totalBalance = totalIncome - totalSpent;
 
-        final groupedExpenses = groupBy(appState.expenses, (Expense e) {
+        final categories = appState.expenses.map((e) => e.category).toSet().toList();
+        final expenseTypes = appState.expenses.map((e) => e.type).toSet().toList();
+        final List<String> dateFilters = [
+          'All',
+          'Daily',
+          'Weekly',
+          'Monthly',
+          'Yearly',
+          'Select Date Range'
+        ];
+
+        final filteredExpenses = appState.expenses
+            .where((expense) =>
+            (selectedCategory == null ||
+                expense.category == selectedCategory) &&
+            (selectedExpenseType == null ||
+                expense.type == selectedExpenseType))
+            .toList();
+
+        final groupedExpenses = groupBy(filteredExpenses, (Expense e) {
           return DateFormat('MMMM dd, yyyy').format(e.date);
         });
 
-        final filteredExpenses =
+        final dateFilteredExpenses =
         Map.fromEntries(groupedExpenses.entries.where((entry) {
           var entryDate = DateFormat('MMMM dd, yyyy').parse(entry.key);
-          var expenses = entry.value;
-          if (selectedCategory != null) {
-            expenses = expenses.where((expense) => expense.category == selectedCategory).toList();
-          }
-          if (selectedExpenseType != null) {
-            expenses = expenses.where((expense) => expense.type == selectedExpenseType).toList();
-          }
-          if (expenses.isEmpty) {
-            return false;
-          }
           if (appState.selectedButton == 'All') {
             return true;
           } else if (appState.selectedButton == 'Daily') {
@@ -139,7 +145,7 @@ class HomePageState extends State<HomePage> {
           }
         }));
 
-        final expensesByDate = filteredExpenses.entries.toList();
+        final expensesByDate = dateFilteredExpenses.entries.toList();
 
         // Sort the expenses by date in descending order (from now to before)
         expensesByDate.sort((a, b) {
