@@ -61,7 +61,7 @@ class OverviewPage extends StatelessWidget {
 
       final calculatedCategory = calculateCategoryExpenses(expenses);
       final categoryExpenses = calculatedCategory['categoryExpenses'];
-      final categoryColors = calculateCategoryColors(expenses);
+      final categoryColors = calculateCategoryColors(expenses.where((expense) => expense.type != 'Income').toList());
 
       return Scaffold(
         appBar: PreferredSize(

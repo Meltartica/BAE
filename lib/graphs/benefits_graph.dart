@@ -21,12 +21,11 @@ Map<String, double> calculateCategoryExpenses(List<Benefit> benefits) {
 
 Map<String, Color> calculateCategoryColors(List<Benefit> benefits) {
   Map<String, Color> categoryColors = {};
-  List<Color> availableColors = [Colors.red, Colors.green, Colors.blue, Colors.yellow]; // Add more colors as needed
 
   int colorIndex = 0;
   for (var benefit in benefits) {
     if (!categoryColors.containsKey(benefit.category)) {
-      categoryColors[benefit.category] = availableColors[colorIndex % availableColors.length];
+      categoryColors[benefit.category] = pieColors[colorIndex % pieColors.length];
       colorIndex++;
     }
   }
